@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://036csi2xfnk3"]
+
+[ext_resource type="PackedScene" uid="uid://cfrrc0etvp5bf" path="res://kenney_tower-defense-kit/Models/GLB format/tile-tree-double.glb" id="1_c7s6e"]
+[ext_resource type="PackedScene" uid="uid://bv7kv571tr038" path="res://kenney_tower-defense-kit/Models/GLB format/tile.glb" id="1_e0an3"]
+[ext_resource type="PackedScene" uid="uid://dcv0uenc3f0r" path="res://kenney_tower-defense-kit/Models/GLB format/tile-tree-quad.glb" id="3_p5pve"]
+[ext_resource type="PackedScene" uid="uid://frl2tmtxxrgi" path="res://kenney_tower-defense-kit/Models/GLB format/tile-crystal.glb" id="4_urblq"]
+[ext_resource type="PackedScene" uid="uid://b758ofvdrmsjc" path="res://kenney_tower-defense-kit/Models/GLB format/tile-river-corner.glb" id="5_urblq"]
+
+[node name="Map" type="Node3D" unique_id=1309176334]
+
+[node name="tile2" parent="." unique_id=1687172988 instance=ExtResource("1_e0an3")]
+transform = Transform3D(1, 0, 0, 0, 5, 0, 0, 0, 1, 0, -0.79999995, 1)
+
+[node name="tile3" parent="." unique_id=690216570 instance=ExtResource("1_e0an3")]
+transform = Transform3D(1, 0, 0, 0, 2.5, 0, 0, 0, 1, 0, -0.79999995, 2)
+
+[node name="tile-tree-double2" parent="." unique_id=1680544168 instance=ExtResource("1_c7s6e")]
+
+[node name="tile-tree-quad2" parent="." unique_id=318926727 instance=ExtResource("3_p5pve")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1)
+
+[node name="tile-crystal2" parent="." unique_id=2072806508 instance=ExtResource("4_urblq")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
+
+[node name="tile-river-corner2" parent="." unique_id=596274924 instance=ExtResource("5_urblq")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 1, 0, 2)

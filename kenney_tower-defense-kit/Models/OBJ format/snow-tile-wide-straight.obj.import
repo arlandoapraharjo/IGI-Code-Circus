@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://gofs7vifeeae"
+path="res://.godot/imported/snow-tile-wide-straight.obj-8b9cb1f3042291e6e144bc3a71b9ac56.mesh"
+
+[deps]
+
+files=["res://.godot/imported/snow-tile-wide-straight.obj-8b9cb1f3042291e6e144bc3a71b9ac56.mesh"]
+
+source_file="res://kenney_tower-defense-kit/Models/OBJ format/snow-tile-wide-straight.obj"
+dest_files=["res://.godot/imported/snow-tile-wide-straight.obj-8b9cb1f3042291e6e144bc3a71b9ac56.mesh", "res://.godot/imported/snow-tile-wide-straight.obj-8b9cb1f3042291e6e144bc3a71b9ac56.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

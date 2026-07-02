@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://myq5wk0j3w6y"
+path="res://.godot/imported/snow-detail-tree-large.obj-95f21e4416f428d624134e230bfc016e.mesh"
+
+[deps]
+
+files=["res://.godot/imported/snow-detail-tree-large.obj-95f21e4416f428d624134e230bfc016e.mesh"]
+
+source_file="res://kenney_tower-defense-kit/Models/OBJ format/snow-detail-tree-large.obj"
+dest_files=["res://.godot/imported/snow-detail-tree-large.obj-95f21e4416f428d624134e230bfc016e.mesh", "res://.godot/imported/snow-detail-tree-large.obj-95f21e4416f428d624134e230bfc016e.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

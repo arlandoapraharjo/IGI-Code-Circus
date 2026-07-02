@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://dhnh755c460px"
+path="res://.godot/imported/snow-tile-tree-quad.obj-c14dd0e8a8aa05994e88eae2d316ca0f.mesh"
+
+[deps]
+
+files=["res://.godot/imported/snow-tile-tree-quad.obj-c14dd0e8a8aa05994e88eae2d316ca0f.mesh"]
+
+source_file="res://kenney_tower-defense-kit/Models/OBJ format/snow-tile-tree-quad.obj"
+dest_files=["res://.godot/imported/snow-tile-tree-quad.obj-c14dd0e8a8aa05994e88eae2d316ca0f.mesh", "res://.godot/imported/snow-tile-tree-quad.obj-c14dd0e8a8aa05994e88eae2d316ca0f.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false
