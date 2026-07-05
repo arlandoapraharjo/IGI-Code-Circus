@@ -9,9 +9,9 @@
 script = ExtResource("1_script")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=191958186]
-transform = Transform3D(1, 0, 0, 0, 0.6729436, 0.7396938, 0, -0.7396938, 0.6729436, 7.433077, 9.972796, 18.059446)
+transform = Transform3D(0.73845536, -0.498735, 0.45381397, 0, 0.67301255, 0.7396311, -0.6743024, -0.54618454, 0.49698976, 20.702723, 11.92209, 21.013853)
 current = true
-fov = 54.84376
+fov = 66.80169
 script = ExtResource("2_camera_script")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=240699733]
