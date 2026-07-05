@@ -1,7 +1,7 @@
 extends Node3D
 
 # Speed in tiles per second
-@export var speed: float = 3.0
+@export var speed: float = 2.3
 
 var path_waypoints: Array[Vector3] = []
 var current_waypoint_index: int = 0
