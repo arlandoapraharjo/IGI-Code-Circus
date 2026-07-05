@@ -161,20 +161,22 @@ func _get_rotation_from_dir(dir: Vector2i) -> float:
 	return 0.0
 
 func _get_corner_rotation(dir_in: Vector2i, dir_out: Vector2i) -> float:
-	# Corner tiles usually connect from -Z to +X or similar.
-	# We need to map combinations of (dir_in, dir_out) to Y rotations.
-	# In this logic:
-	# dir_in is the vector FROM previous TO current
-	# dir_out is the vector FROM current TO next
+	# We map every possible corner to an explicit rotation in degrees.
+	# Assuming Kenney's default corner (0 degrees) connects South (+Z) and East (+X).
 	
-	if (dir_in == Vector2i(0, 1) and dir_out == Vector2i(1, 0)) or (dir_in == Vector2i(-1, 0) and dir_out == Vector2i(0, -1)):
-		# Path came from Z- (going Z+) and turns X+, OR came from X+ (going X-) and turns Z-
-		return -PI / 2.0
-	if (dir_in == Vector2i(0, 1) and dir_out == Vector2i(-1, 0)) or (dir_in == Vector2i(1, 0) and dir_out == Vector2i(0, -1)):
-		return PI
-	if (dir_in == Vector2i(0, -1) and dir_out == Vector2i(1, 0)) or (dir_in == Vector2i(-1, 0) and dir_out == Vector2i(0, 1)):
-		return 0.0
-	if (dir_in == Vector2i(0, -1) and dir_out == Vector2i(-1, 0)) or (dir_in == Vector2i(1, 0) and dir_out == Vector2i(0, 1)):
-		return PI / 2.0
+	# 1. Path comes from Left (West), goes Up (North) -> Connects West and North
+	if dir_in == Vector2i(1, 0) and dir_out == Vector2i(0, -1):
+		return deg_to_rad(180)
+	# Path comes from Down (South), goes Right (East) -> Connects South and East
+	elif dir_in == Vector2i(0, -1) and dir_out == Vector2i(1, 0):
+		return deg_to_rad(0)
 		
+	# 2. Path comes from Left (West), goes Down (South) -> Connects West and South
+	if dir_in == Vector2i(1, 0) and dir_out == Vector2i(0, 1):
+		return deg_to_rad(270)
+	# Path comes from Up (North), goes Right (East) -> Connects North and East
+	elif dir_in == Vector2i(0, 1) and dir_out == Vector2i(1, 0):
+		return deg_to_rad(90)
+		
+	# Fallback (shouldn't happen with our path generator)
 	return 0.0
