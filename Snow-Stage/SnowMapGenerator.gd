@@ -18,61 +18,96 @@ var rock_model = load("res://kenney_tower-defense-kit/Models/GLB format/snow/sno
 # We will define a simple S-shaped path starting from left and ending on the right
 var enemy_path: Array[Vector2i] = []
 
+var spawner_script = preload("res://Snow-Stage/Spawner.gd")
+
 func _ready():
 	_generate_path()
 	_build_map()
+	_setup_spawner()
+
+var dfs_visited: Dictionary = {}
+var target_end: Vector2i
 
 func _generate_path():
 	enemy_path.clear()
-	# Randomize seed so the path changes every time you play
 	randomize()
 	
-	# Start at the left edge (x=0) with a random Y position
-	var current = Vector2i(0, randi_range(2, MAP_SIZE - 3))
-	enemy_path.append(current)
+	# Spawn at x=1 (2nd tile from left)
+	# Defense/End at x=MAP_SIZE-2 (2nd tile from right)
+	var start_y = randi_range(1, MAP_SIZE - 2)
+	var end_y = randi_range(1, MAP_SIZE - 2)
 	
-	var current_dir = 0 # 0: Right, 1: Down, -1: Up
+	var start_pos = Vector2i(1, start_y)
+	target_end = Vector2i(MAP_SIZE - 2, end_y)
 	
-	while current.x < MAP_SIZE - 1:
-		var segment_length = 0
+	var found = false
+	
+	# Try multiple times in case the random DFS traps itself in a dead end
+	for attempt in range(100):
+		dfs_visited.clear()
+		enemy_path.clear()
 		
-		if current_dir == 0:
-			# Going right, decide how far to go (2 to 4 steps)
-			segment_length = randi_range(2, 4)
-			# Don't go past the right edge
-			segment_length = min(segment_length, (MAP_SIZE - 1) - current.x)
+		enemy_path.append(start_pos)
+		dfs_visited[start_pos] = true
+		
+		if _dfs_step(start_pos):
+			found = true
+			break
 			
-			for i in range(segment_length):
-				current.x += 1
-				enemy_path.append(current)
+	# Fallback just in case all 100 attempts fail (extremely rare)
+	if not found:
+		enemy_path.clear()
+		for i in range(1, MAP_SIZE - 1):
+			enemy_path.append(Vector2i(i, start_y))
+
+func _dfs_step(current: Vector2i) -> bool:
+	if current == target_end:
+		return true
+		
+	var dirs = [Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 0), Vector2i(-1, 0)]
+	dirs.shuffle()
+	
+	for dir in dirs:
+		var next_pos = current + dir
+		
+		if _is_valid_step(next_pos):
+			enemy_path.append(next_pos)
+			dfs_visited[next_pos] = true
+			
+			if _dfs_step(next_pos):
+				return true
 				
-			# If we haven't reached the right edge, decide to turn up or down
-			if current.x < MAP_SIZE - 1:
-				if current.y <= 2:
-					current_dir = 1 # Too close to top edge, must go down
-				elif current.y >= MAP_SIZE - 3:
-					current_dir = -1 # Too close to bottom edge, must go up
-				else:
-					current_dir = 1 if randf() > 0.5 else -1 # Random up or down
-		else:
-			# Going up or down
-			segment_length = randi_range(2, 4)
+			# Backtrack if it leads to a dead end
+			enemy_path.pop_back()
+			dfs_visited.erase(next_pos)
 			
-			if current_dir == 1:
-				# Going down
-				segment_length = min(segment_length, (MAP_SIZE - 2) - current.y)
-				for i in range(segment_length):
-					current.y += 1
-					enemy_path.append(current)
-			else:
-				# Going up
-				segment_length = min(segment_length, current.y - 1)
-				for i in range(segment_length):
-					current.y -= 1
-					enemy_path.append(current)
-					
-			# After moving vertically, we MUST go right to progress towards the end
-			current_dir = 0
+	return false
+
+func _is_valid_step(pos: Vector2i) -> bool:
+	# 1. Bounds check (strict 1-tile border all around)
+	if pos.x < 1 or pos.x > MAP_SIZE - 2 or pos.y < 1 or pos.y > MAP_SIZE - 2:
+		return false
+		
+	# 2. Prevent revisiting
+	if dfs_visited.has(pos):
+		return false
+		
+	# 3. Adjacency rule: Ensure exactly 1 tile gap between path lines
+	var adjacent_visited = 0
+	var check_dirs = [Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 0), Vector2i(-1, 0)]
+	
+	for dir in check_dirs:
+		var neighbor = pos + dir
+		if dfs_visited.has(neighbor):
+			adjacent_visited += 1
+			
+	# A valid next step should only touch the cell we just came from
+	# (which means exactly 1 adjacent visited cell).
+	# We slightly relax this if we are stepping onto the target_end to allow finishing.
+	if adjacent_visited > 1 and pos != target_end:
+		return false
+		
+	return true
 
 func _build_map():
 	# Clear existing children just in case
@@ -161,22 +196,50 @@ func _get_rotation_from_dir(dir: Vector2i) -> float:
 	return 0.0
 
 func _get_corner_rotation(dir_in: Vector2i, dir_out: Vector2i) -> float:
-	# We map every possible corner to an explicit rotation in degrees.
-	# Assuming Kenney's default corner (0 degrees) connects South (+Z) and East (+X).
-	
-	# 1. Path comes from Left (West), goes Up (North) -> Connects West and North
-	if dir_in == Vector2i(1, 0) and dir_out == Vector2i(0, -1):
+	# Asset confirmed: 0deg = {West(-X), North(-Z)} openings.
+	# Godot positive Y-rotation = CCW from above. Each 90deg CCW step:
+	#   West→South, North→West, East→North, South→East
+	#
+	#   0deg:  {West,  North} 
+	#   90deg: {South, West}    ← NOTE: 90deg CCW moves West→South, North→West
+	#  180deg: {East,  South}
+	#  270deg: {North, East}
+
+	# 0deg → now 180deg
+	if (dir_in == Vector2i(1, 0) and dir_out == Vector2i(0, -1)) or \
+	   (dir_in == Vector2i(0, 1) and dir_out == Vector2i(-1, 0)):
 		return deg_to_rad(180)
-	# Path comes from Down (South), goes Right (East) -> Connects South and East
-	elif dir_in == Vector2i(0, -1) and dir_out == Vector2i(1, 0):
-		return deg_to_rad(0)
-		
-	# 2. Path comes from Left (West), goes Down (South) -> Connects West and South
-	if dir_in == Vector2i(1, 0) and dir_out == Vector2i(0, 1):
+
+	# 90deg → now 270deg
+	if (dir_in == Vector2i(0, -1) and dir_out == Vector2i(-1, 0)) or \
+	   (dir_in == Vector2i(1, 0) and dir_out == Vector2i(0, 1)):
 		return deg_to_rad(270)
-	# Path comes from Up (North), goes Right (East) -> Connects North and East
-	elif dir_in == Vector2i(0, 1) and dir_out == Vector2i(1, 0):
+
+	# 180deg → now 0deg
+	if (dir_in == Vector2i(-1, 0) and dir_out == Vector2i(0, 1)) or \
+	   (dir_in == Vector2i(0, -1) and dir_out == Vector2i(1, 0)):
+		return 0.0
+
+	# 270deg → now 90deg
+	if (dir_in == Vector2i(0, 1) and dir_out == Vector2i(1, 0)) or \
+	   (dir_in == Vector2i(-1, 0) and dir_out == Vector2i(0, -1)):
 		return deg_to_rad(90)
-		
-	# Fallback (shouldn't happen with our path generator)
+
 	return 0.0
+
+func _setup_spawner() -> void:
+	# Remove any existing spawner to avoid duplicates on regeneration
+	var old_spawner = get_node_or_null("Spawner")
+	if old_spawner:
+		old_spawner.queue_free()
+		
+	if enemy_path.is_empty():
+		return
+		
+	var spawner = Node3D.new()
+	spawner.name = "Spawner"
+	spawner.set_script(spawner_script)
+	add_child(spawner)
+	
+	# Pass the generated path to the spawner
+	spawner.setup(enemy_path)
