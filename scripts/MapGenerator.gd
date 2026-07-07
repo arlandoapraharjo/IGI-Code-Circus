@@ -10,7 +10,8 @@ const BUSH_SCALE_MAX = 0.75 # largest random bush size
 const BUSH_CAST_SHADOWS = false # alpha-blended wind-animated shadows are expensive for how little bushes contribute visually
 const BUSH_VISIBILITY_END = 35.0 # bushes fully disappear past this distance
 const BUSH_VISIBILITY_FADE = 6.0 # distance over which they fade out, instead of popping
-
+const BORDER_WIDTH = 4 # ring coast
+const BORDER_HEIGHT_STEP = 0.1 # height down
 ## Assign one or more BiomeData resources in the Inspector (one per biome —
 ## e.g. biome_snow.tres, biome_desert.tres, biome_grass.tres). One is picked
 ## at random each run. To force a specific biome instead of random, leave
@@ -20,7 +21,11 @@ const BUSH_VISIBILITY_FADE = 6.0 # distance over which they fade out, instead of
 ## Drag the scene's WorldEnvironment node here so the generator can swap in
 ## the active biome's Environment resource.
 @export var world_environment_node: WorldEnvironment
-
+## Coastal Style
+@export var border_noise_frequency: float = 0.9 # contour coastal
+@export var border_noise_type: FastNoiseLite.NoiseType = FastNoiseLite.TYPE_PERLIN
+@export var border_detail_frequency: float = 0.1 
+@export var border_detail_strength: float = 0.8
 # Resolved from whichever BiomeData is active this run — populated by
 # _apply_biome() before generation starts. Nothing below this point
 # hardcodes a specific biome's assets.
@@ -34,7 +39,11 @@ var tree_large_model: PackedScene
 var rock_model: PackedScene
 var bush_model: PackedScene
 var decoration_chance: float = 0.2
-
+## Coastal
+var mm_border: MultiMeshInstance3D
+var border_noise := FastNoiseLite.new()
+var border_noise_detail := FastNoiseLite.new()
+##
 # Path definition: list of Vector2i grid coordinates
 var enemy_path: Array[Vector2i] = []
 # O(1) lookup of position -> index in enemy_path (replaces .has()/.find())
@@ -53,6 +62,13 @@ var mm_bushes: Array[MultiMeshInstance3D] = []
 
 func _ready():
 	randomize() # only need to seed the RNG once, not every generation
+	border_noise.seed = randi()
+	border_noise.frequency = border_noise_frequency
+	border_noise.noise_type = border_noise_type
+
+	border_noise_detail.seed = randi() + 1000
+	border_noise_detail.frequency = border_detail_frequency
+	border_noise_detail.noise_type = FastNoiseLite.TYPE_PERLIN
 	_apply_biome(_pick_biome())
 	_generate_path()
 	_build_map()
@@ -323,6 +339,7 @@ func _build_map():
 						bush_transforms[variant_idx].append(bush_xform)
 
 	_apply_multimesh(mm_base, base_transforms)
+	_build_coastal_border()
 	_apply_multimesh(mm_tree, tree_transforms)
 	_apply_multimesh(mm_tree_large, tree_large_transforms)
 	_apply_multimesh(mm_rock, rock_transforms)
@@ -330,6 +347,53 @@ func _build_map():
 		_apply_multimesh(mm_bushes[i], bush_transforms[i])
 
 # --- MultiMesh helpers -------------------------------------------------
+
+func _build_coastal_border():
+	mm_border = _make_multimesh_node("CoastalBorder", tile_base)
+	var border_transforms: Array[Transform3D] = []
+
+	var center = Vector2(float(MAP_SIZE - 1) / 2.0, float(MAP_SIZE - 1) / 2.0)
+
+	for x in range(-BORDER_WIDTH - 2, MAP_SIZE + BORDER_WIDTH + 2):
+		for z in range(-BORDER_WIDTH - 2, MAP_SIZE + BORDER_WIDTH + 2):
+			if x >= 0 and x < MAP_SIZE and z >= 0 and z < MAP_SIZE:
+				continue
+
+			var dist_x = 0.0
+			if x < 0:
+				dist_x = -x
+			elif x >= MAP_SIZE:
+				dist_x = x - MAP_SIZE + 1
+
+			var dist_z = 0.0
+			if z < 0:
+				dist_z = -z
+			elif z >= MAP_SIZE:
+				dist_z = z - MAP_SIZE + 1
+
+			var ring = sqrt(dist_x * dist_x + dist_z * dist_z)
+
+			var to_point = Vector2(x, z) - center
+			var angle = to_point.angle() # -PI .. PI
+
+			var n_base = border_noise.get_noise_2d(cos(angle) * 4.0, sin(angle) * 4.0)
+			var n_detail = border_noise_detail.get_noise_2d(cos(angle) * 8.0, sin(angle) * 8.0)
+
+			var n = n_base + n_detail * border_detail_strength
+			n = clampf(n, -1.0, 1.0)
+
+			var local_max_ring = BORDER_WIDTH + n * BORDER_WIDTH * 0.6
+
+			if ring > local_max_ring:
+				continue
+
+			var y = -ring * BORDER_HEIGHT_STEP
+			y += n * BORDER_HEIGHT_STEP * 0.5
+
+			var origin = Vector3(x * TILE_SIZE, y, z * TILE_SIZE)
+			border_transforms.append(Transform3D(Basis(), origin))
+
+	_apply_multimesh(mm_border, border_transforms)
 
 func _extract_mesh_and_material(scene: PackedScene) -> Dictionary:
 	var temp = scene.instantiate()
