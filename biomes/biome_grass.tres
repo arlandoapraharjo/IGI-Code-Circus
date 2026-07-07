@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="BiomeData" format=3 uid="uid://cgsne48ch7k6g"]
+
+[ext_resource type="Script" uid="uid://dt3mmbm7kd8rn" path="res://biomes/BiomeData.gd" id="1_36vdi"]
+[ext_resource type="PackedScene" uid="uid://b7e0ywe1g86fa" path="res://addons/Mesh/Bush2GLB3.tscn" id="1_nvp4h"]
+[ext_resource type="Environment" uid="uid://b4eww6pbq3efd" path="res://addons/Shader/default_env.tres" id="1_vqqub"]
+[ext_resource type="PackedScene" uid="uid://cifu6pkjchn3b" path="res://assets/Models/GLB format/detail-rocks-large.glb" id="3_s6fgd"]
+[ext_resource type="PackedScene" uid="uid://bv7kv571tr038" path="res://assets/Models/GLB format/tile.glb" id="4_omfny"]
+[ext_resource type="PackedScene" uid="uid://cj4qd2hccxfxk" path="res://assets/Models/GLB format/tile-straight.glb" id="5_0n03m"]
+[ext_resource type="PackedScene" uid="uid://ddavm8a3gljea" path="res://assets/Models/GLB format/tile-corner-round.glb" id="5_3ryor"]
+[ext_resource type="PackedScene" uid="uid://bk0pcbwcsm8po" path="res://assets/Models/GLB format/tile-end-round.glb" id="5_6gknu"]
+[ext_resource type="PackedScene" uid="uid://dcv0uenc3f0r" path="res://assets/Models/GLB format/tile-tree-quad.glb" id="5_38rfi"]
+[ext_resource type="PackedScene" uid="uid://couxy71kfds8n" path="res://assets/Models/GLB format/tile-tree.glb" id="5_omfny"]
+[ext_resource type="PackedScene" uid="uid://dftc3vgaldfnf" path="res://assets/Models/GLB format/tile-spawn-end-round.glb" id="6_3ryor"]
+
+[resource]
+script = ExtResource("1_36vdi")
+tile_base = ExtResource("4_omfny")
+tile_straight = ExtResource("5_0n03m")
+tile_corner = ExtResource("5_3ryor")
+tile_spawn = ExtResource("6_3ryor")
+tile_end = ExtResource("5_6gknu")
+tree_model = ExtResource("5_omfny")
+tree_large_model = ExtResource("5_38rfi")
+rock_model = ExtResource("3_s6fgd")
+bush_model = ExtResource("1_nvp4h")
+environment = ExtResource("1_vqqub")
+metadata/_custom_type_script = "uid://dt3mmbm7kd8rn"

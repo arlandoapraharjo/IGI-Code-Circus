@@ -1,7 +1,0 @@
-[gd_scene format=3 uid="uid://bqtngrenq4ivs"]
-
-[ext_resource type="PackedScene" uid="uid://b82i46engy0pb" path="res://kenney_tower-defense-kit/Models/GLB format/weapon-turret.glb" id="1_3oylf"]
-
-[node name="Turret" type="Node3D" unique_id=1625973096]
-
-[node name="weapon-turret2" parent="." unique_id=1406903681 instance=ExtResource("1_3oylf")]
