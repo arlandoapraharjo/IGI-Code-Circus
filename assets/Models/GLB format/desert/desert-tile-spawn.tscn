@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://6ljpwl3pkb5l"]
+
+[ext_resource type="PackedScene" uid="uid://c4cxd481sly5j" path="res://assets/Models/GLB format/tile-spawn.glb" id="1_oxt57"]
+[ext_resource type="Material" uid="uid://cekgndpskgl0l" path="res://assets/materials/desert_color.tres" id="2_hmvft"]
+
+[node name="tile-spawn2" unique_id=70625708 instance=ExtResource("1_oxt57")]
+
+[node name="tile-spawn" parent="." index="0" unique_id=1069289915]
+surface_material_override/0 = ExtResource("2_hmvft")

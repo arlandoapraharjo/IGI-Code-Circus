@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="BiomeData" format=3 uid="uid://dkkpml6w0got6"]
+
+[ext_resource type="Script" uid="uid://dt3mmbm7kd8rn" path="res://biomes/BiomeData.gd" id="1_725qa"]
+[ext_resource type="Environment" uid="uid://eje2tefugyb2" path="res://addons/Shader/desert_env.tres" id="1_kqj8a"]
+[ext_resource type="PackedScene" uid="uid://b7e0ywe1g86fa" path="res://addons/Mesh/Bush2GLB3.tscn" id="1_oq5im"]
+[ext_resource type="PackedScene" uid="uid://b5voy3r5o0ble" path="res://assets/Models/GLB format/desert/detail-dirt.glb" id="3_oq5im"]
+[ext_resource type="PackedScene" uid="uid://c0048euacj2jx" path="res://assets/Models/GLB format/desert/desert-tile.tscn" id="5_kqa02"]
+[ext_resource type="PackedScene" uid="uid://by1gxsl52psa6" path="res://assets/Models/GLB format/desert/desert-tile-corner.tscn" id="6_ej4pw"]
+[ext_resource type="PackedScene" uid="uid://c83x5v4542cgj" path="res://assets/Models/GLB format/desert/desert-tile-spawnend.tscn" id="7_nk1r8"]
+[ext_resource type="PackedScene" uid="uid://6ljpwl3pkb5l" path="res://assets/Models/GLB format/desert/desert-tile-spawn.tscn" id="8_vpp5a"]
+[ext_resource type="PackedScene" uid="uid://8yl2cyvdmycj" path="res://assets/Models/GLB format/desert/desert-tile-straight.tscn" id="9_tttv0"]
+[ext_resource type="PackedScene" uid="uid://c2lgwekgawysn" path="res://assets/Models/GLB format/desert/kaktusss.glb" id="10_kqa02"]
+[ext_resource type="PackedScene" uid="uid://dmll0q7v1mikg" path="res://assets/Models/GLB format/desert/Kaktus cilikkk.glb" id="11_kqa02"]
+
+[resource]
+script = ExtResource("1_725qa")
+tile_base = ExtResource("5_kqa02")
+tile_straight = ExtResource("9_tttv0")
+tile_corner = ExtResource("6_ej4pw")
+tile_spawn = ExtResource("8_vpp5a")
+tile_end = ExtResource("7_nk1r8")
+tree_model = ExtResource("11_kqa02")
+tree_large_model = ExtResource("10_kqa02")
+rock_model = ExtResource("3_oq5im")
+bush_model = ExtResource("1_oq5im")
+environment = ExtResource("1_kqj8a")
+metadata/_custom_type_script = "uid://dt3mmbm7kd8rn"
