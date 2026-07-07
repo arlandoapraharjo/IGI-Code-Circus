@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="BiomeData" format=3 uid="uid://ub8ponw0r6f8"]
+
+[ext_resource type="PackedScene" uid="uid://b7e0ywe1g86fa" path="res://addons/Mesh/Bush2GLB3.tscn" id="1_4f7rl"]
+[ext_resource type="Script" uid="uid://dt3mmbm7kd8rn" path="res://biomes/BiomeData.gd" id="1_87pvo"]
+[ext_resource type="Environment" uid="uid://b4eww6pbq3efd" path="res://addons/Shader/default_env.tres" id="1_tbtkb"]
+[ext_resource type="PackedScene" uid="uid://lu6smox3pv10" path="res://assets/Models/GLB format/snow/snow-tile.glb" id="3_r35qr"]
+[ext_resource type="PackedScene" uid="uid://d1y7n08oe333i" path="res://assets/Models/GLB format/snow/snow-tile-rock.glb" id="3_wh0ca"]
+[ext_resource type="PackedScene" uid="uid://byuqo1p6v8jd7" path="res://assets/Models/GLB format/snow/snow-tile-corner-round.glb" id="4_br14u"]
+[ext_resource type="PackedScene" uid="uid://cpgf8xrolcdcn" path="res://assets/Models/GLB format/snow/snow-tile-spawn-end-round.glb" id="5_vhchl"]
+[ext_resource type="PackedScene" uid="uid://wbdvkxhcbuxs" path="res://assets/Models/GLB format/snow/snow-tile-end-round.glb" id="7_4f7rl"]
+[ext_resource type="PackedScene" uid="uid://38nk5i8vrf66" path="res://assets/Models/GLB format/snow/snow-tile-straight.glb" id="7_wh0ca"]
+[ext_resource type="PackedScene" uid="uid://c58bkhmbqu1uq" path="res://assets/Models/GLB format/snow/snow-tile-tree-quad.glb" id="10_hl46c"]
+[ext_resource type="PackedScene" uid="uid://b45namaxsgl8f" path="res://assets/Models/GLB format/snow/snow-detail-tree.glb" id="11_wh0ca"]
+
+[resource]
+script = ExtResource("1_87pvo")
+tile_base = ExtResource("3_r35qr")
+tile_straight = ExtResource("7_wh0ca")
+tile_corner = ExtResource("4_br14u")
+tile_spawn = ExtResource("5_vhchl")
+tile_end = ExtResource("7_4f7rl")
+tree_model = ExtResource("11_wh0ca")
+tree_large_model = ExtResource("10_hl46c")
+rock_model = ExtResource("3_wh0ca")
+bush_model = ExtResource("1_4f7rl")
+environment = ExtResource("1_tbtkb")
+metadata/_custom_type_script = "uid://dt3mmbm7kd8rn"
