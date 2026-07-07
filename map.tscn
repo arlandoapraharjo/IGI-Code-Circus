@@ -4,15 +4,18 @@
 [ext_resource type="Script" uid="uid://byp7p3p447u7h" path="res://scripts/CameraController.gd" id="2_p5pve"]
 [ext_resource type="Script" uid="uid://dt3mmbm7kd8rn" path="res://biomes/BiomeData.gd" id="2_urblq"]
 [ext_resource type="Resource" uid="uid://ub8ponw0r6f8" path="res://biomes/biome_snow.tres" id="3_iw27f"]
-[ext_resource type="Environment" uid="uid://b4eww6pbq3efd" path="res://addons/Shader/default_env.tres" id="3_urblq"]
 [ext_resource type="Resource" uid="uid://cgsne48ch7k6g" path="res://biomes/biome_grass.tres" id="4_iw27f"]
+[ext_resource type="Resource" uid="uid://dkkpml6w0got6" path="res://biomes/biome_desert.tres" id="5_iw27f"]
 
 [node name="World" type="Node3D" unique_id=67285049]
 
-[node name="Map" type="Node3D" parent="." unique_id=1197104861]
+[node name="WorldEnvironment2" type="WorldEnvironment" parent="." unique_id=483959264]
+
+[node name="Map" type="Node3D" parent="." unique_id=1197104861 node_paths=PackedStringArray("world_environment_node")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.90186214)
 script = ExtResource("1_e0an3")
-biomes = Array[ExtResource("2_urblq")]([ExtResource("3_iw27f"), ExtResource("4_iw27f")])
+biomes = Array[ExtResource("2_urblq")]([ExtResource("3_iw27f"), ExtResource("4_iw27f"), ExtResource("5_iw27f")])
+world_environment_node = NodePath("../WorldEnvironment2")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=191958186]
 transform = Transform3D(0.73845536, -0.498735, 0.453814, 0, 0.67301255, 0.7396311, -0.6743024, -0.54618454, 0.49698973, 20.682722, 11.92209, 21.398424)
@@ -23,6 +26,3 @@ script = ExtResource("2_p5pve")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=240699733]
 transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 10, 0)
 shadow_enabled = true
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1425297858]
-environment = ExtResource("3_urblq")

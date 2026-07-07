@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://by1gxsl52psa6"]
+
+[ext_resource type="PackedScene" uid="uid://ddavm8a3gljea" path="res://assets/Models/GLB format/tile-corner-round.glb" id="1_d2p0d"]
+[ext_resource type="Material" uid="uid://cekgndpskgl0l" path="res://assets/materials/desert_color.tres" id="2_pveei"]
+
+[node name="tile-corner-round2" instance=ExtResource("1_d2p0d")]
+
+[node name="tile-corner-round" parent="." index="0"]
+surface_material_override/0 = ExtResource("2_pveei")

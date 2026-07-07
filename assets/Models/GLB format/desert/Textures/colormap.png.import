@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cbdt2a24p3i02"
-path.s3tc="res://.godot/imported/variation-a.png-054a6a093c97fc4331a8ada0f9b90555.s3tc.ctex"
+uid="uid://c14ianqiwkppl"
+path.s3tc="res://.godot/imported/colormap.png-b3ef76da2e8003afb5b068329e61d9a9.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/Models/Textures/variation-a.png"
-dest_files=["res://.godot/imported/variation-a.png-054a6a093c97fc4331a8ada0f9b90555.s3tc.ctex"]
+source_file="res://assets/Models/GLB format/desert/Textures/colormap.png"
+dest_files=["res://.godot/imported/colormap.png-b3ef76da2e8003afb5b068329e61d9a9.s3tc.ctex"]
 
 [params]
 

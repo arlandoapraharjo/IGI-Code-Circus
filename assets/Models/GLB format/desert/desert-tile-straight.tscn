@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://8yl2cyvdmycj"]
+
+[ext_resource type="PackedScene" uid="uid://cj4qd2hccxfxk" path="res://assets/Models/GLB format/tile-straight.glb" id="1_lxgup"]
+[ext_resource type="Material" uid="uid://cekgndpskgl0l" path="res://assets/materials/desert_color.tres" id="2_k08pr"]
+
+[node name="tile-straight2" unique_id=1592864642 instance=ExtResource("1_lxgup")]
+
+[node name="tile-straight" parent="." index="0" unique_id=1386338086]
+surface_material_override/0 = ExtResource("2_k08pr")
