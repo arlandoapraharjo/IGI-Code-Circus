@@ -20,6 +20,12 @@ func reset(waypoints: Array[Vector3], new_speed: float) -> void:
 	set_physics_process(true)
 	if not waypoints.is_empty():
 		position = waypoints[0]
+		if waypoints.size() > 1:
+			var dir = waypoints[1] - waypoints[0]
+			var look_dir = Vector3(dir.x, 0, dir.z)
+			if look_dir.length() > 0.001:
+				var look_pos = position + look_dir.normalized()
+				look_at(get_parent().to_global(look_pos), Vector3.UP)
 ## Hide and stop processing — the Spawner will reclaim this node.
 func deactivate() -> void:
 	_is_done = true
@@ -58,7 +64,9 @@ func _physics_process(delta: float) -> void:
 				var look_dir = Vector3(next_target.x - position.x, 0, next_target.z - position.z)
 				if look_dir.length() > 0.001:
 					var look_pos = position + look_dir.normalized()
-					look_at(get_parent().to_global(look_pos), Vector3.UP)
+					var global_look = get_parent().to_global(look_pos)
+					var target_transform = global_transform.looking_at(global_look, Vector3.UP)
+					global_transform.basis = global_transform.basis.slerp(target_transform.basis, 15.0 * delta)
 		else:
 			var dir = to_target / dist # already-normalized direction, reusing the length we computed
 			position += dir * remaining_move
@@ -66,7 +74,9 @@ func _physics_process(delta: float) -> void:
 			var look_dir = Vector3(dir.x, 0, dir.z)
 			if look_dir.length() > 0.001:
 				var look_pos = position + look_dir.normalized()
-				look_at(get_parent().to_global(look_pos), Vector3.UP)
+				var global_look = get_parent().to_global(look_pos)
+				var target_transform = global_transform.looking_at(global_look, Vector3.UP)
+				global_transform.basis = global_transform.basis.slerp(target_transform.basis, 15.0 * delta)
 
 			remaining_move = 0.0
 

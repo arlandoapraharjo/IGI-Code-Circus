@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c0048euacj2jx"]
 
-[ext_resource type="PackedScene" uid="uid://bv7kv571tr038" path="res://assets/Models/GLB format/tile.glb" id="1_v43lx"]
+[ext_resource type="PackedScene" uid="uid://bv7kv571tr038" path="res://assets/Models/GLB format/grass/tile.glb" id="1_v43lx"]
 [ext_resource type="Material" uid="uid://cekgndpskgl0l" path="res://assets/materials/desert_color.tres" id="2_g6kgl"]
 
 [node name="tile2" unique_id=1581820430 instance=ExtResource("1_v43lx")]

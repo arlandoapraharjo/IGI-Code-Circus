@@ -11,7 +11,7 @@ const BUSH_CAST_SHADOWS = false # alpha-blended wind-animated shadows are expens
 const BUSH_VISIBILITY_END = 35.0 # bushes fully disappear past this distance
 const BUSH_VISIBILITY_FADE = 6.0 # distance over which they fade out, instead of popping
 const BORDER_WIDTH = 4 # ring coast
-const BORDER_HEIGHT_STEP = 0.1 # height down
+const BORDER_HEIGHT_STEP = 0.15 # height down
 ## Assign one or more BiomeData resources in the Inspector (one per biome —
 ## e.g. biome_snow.tres, biome_desert.tres, biome_grass.tres). One is picked
 ## at random each run. To force a specific biome instead of random, leave
@@ -322,7 +322,11 @@ func _build_map():
 
 				if randf() < decoration_chance:
 					var r = randf()
-					var rot_y = randf() * TAU
+					var rot_y = 0.0
+					if x == 0 or x == MAP_SIZE - 1 or z == 0 or z == MAP_SIZE - 1:
+						rot_y = (randi() % 4) * (PI / 2.0)
+					else:
+						rot_y = randf() * TAU
 					var deco_basis = Basis(Vector3.UP, rot_y)
 					var deco_xform = Transform3D(deco_basis, origin)
 					if r > 0.75:

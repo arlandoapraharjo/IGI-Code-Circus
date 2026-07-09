@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b32ip5n52nwj0"
-path.s3tc="res://.godot/imported/colormap.png-8e95e07fb01dbe8122f3bce2037378cf.s3tc.ctex"
+uid="uid://byhar6jogr0rm"
+path.s3tc="res://.godot/imported/colormap.png-2e51c0fe15ff6b139cebb6b02e504963.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/Models/OBJ format/Textures/colormap.png"
-dest_files=["res://.godot/imported/colormap.png-8e95e07fb01dbe8122f3bce2037378cf.s3tc.ctex"]
+source_file="res://assets/Models/GLB format/grass/Textures/colormap.png"
+dest_files=["res://.godot/imported/colormap.png-2e51c0fe15ff6b139cebb6b02e504963.s3tc.ctex"]
 
 [params]
 

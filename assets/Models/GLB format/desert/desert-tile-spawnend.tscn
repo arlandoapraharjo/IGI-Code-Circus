@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c83x5v4542cgj"]
 
-[ext_resource type="PackedScene" uid="uid://cpwvwsxfjd4g1" path="res://assets/Models/GLB format/tile-spawn-end.glb" id="1_my7c1"]
+[ext_resource type="PackedScene" uid="uid://cpwvwsxfjd4g1" path="res://assets/Models/GLB format/grass/tile-spawn-end.glb" id="1_my7c1"]
 [ext_resource type="Material" uid="uid://cekgndpskgl0l" path="res://assets/materials/desert_color.tres" id="2_ixat1"]
 
 [node name="tile-spawn-end2" unique_id=796512578 instance=ExtResource("1_my7c1")]
