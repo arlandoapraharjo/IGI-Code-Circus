@@ -25,5 +25,6 @@ class_name BiomeData
 ## light, tonemap, etc.) — this is what actually makes each biome feel
 ## distinct beyond just the models.
 @export var environment: Environment
+@export var has_heat_distortion: bool = false
 ## Optional: some biomes may want denser/sparser decoration than others.
 @export_range(0.0, 1.0) var decoration_chance: float = 0.2

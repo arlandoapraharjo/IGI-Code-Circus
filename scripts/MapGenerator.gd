@@ -102,6 +102,10 @@ func _apply_biome(biome: BiomeData) -> void:
 	if world_environment_node != null and biome.environment != null:
 		world_environment_node.environment = biome.environment
 
+	var heat_distortion = get_node_or_null("../MeshInstance3D")
+	if heat_distortion:
+		heat_distortion.visible = biome.has_heat_distortion
+
 var target_end: Vector2i
 
 # --- Path generation ----------------------------------------------------

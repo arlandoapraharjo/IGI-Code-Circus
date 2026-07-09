@@ -6,6 +6,29 @@
 [ext_resource type="Resource" uid="uid://ub8ponw0r6f8" path="res://biomes/biome_snow.tres" id="3_iw27f"]
 [ext_resource type="Resource" uid="uid://cgsne48ch7k6g" path="res://biomes/biome_grass.tres" id="4_iw27f"]
 [ext_resource type="Resource" uid="uid://dkkpml6w0got6" path="res://biomes/biome_desert.tres" id="5_iw27f"]
+[ext_resource type="Shader" uid="uid://d3dle2ki2bw12" path="res://heat-haze.gdshader" id="7_71pa8"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_qwqyf"]
+resource_local_to_scene = true
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_62yky"]
+resource_local_to_scene = true
+noise = SubResource("FastNoiseLite_qwqyf")
+seamless = true
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_62yky"]
+viewport_path = NodePath("SubViewport")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mti6b"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("7_71pa8")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_62yky")
+shader_parameter/speed = 0.04000000050297
+shader_parameter/strength = 0.005
+
+[sub_resource type="QuadMesh" id="QuadMesh_4kxuq"]
+size = Vector2(800, 400)
 
 [node name="World" type="Node3D" unique_id=67285049]
 
@@ -26,3 +49,13 @@ script = ExtResource("2_p5pve")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=240699733]
 transform = Transform3D(0.8660253, -0.35355332, 0.35355377, 0, 0.7071072, 0.7071064, -0.50000024, -0.612372, 0.61237276, 23.904772, 26.098438, 32.629635)
 shadow_enabled = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=81203874]
+material_override = SubResource("ShaderMaterial_mti6b")
+mesh = SubResource("QuadMesh_4kxuq")
+
+[node name="SubViewport" type="SubViewport" parent="." unique_id=1033910215]
+use_hdr_2d = true
+size = Vector2i(1152, 648)
+
+[node name="Camera3D" type="Camera3D" parent="SubViewport" unique_id=303465695]

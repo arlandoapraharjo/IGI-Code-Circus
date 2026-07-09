@@ -24,4 +24,5 @@ tree_large_model = ExtResource("10_kqa02")
 rock_model = ExtResource("3_oq5im")
 bush_model = ExtResource("1_oq5im")
 environment = ExtResource("1_kqj8a")
+has_heat_distortion = true
 metadata/_custom_type_script = "uid://dt3mmbm7kd8rn"
