@@ -5,7 +5,7 @@ extends CanvasLayer
 ## All visual properties are @export — configure via Inspector, no hardcoding.
 ## Emits turret_selected(index) when a slot is clicked.
 
-signal turret_selected(index: int)
+signal turret_selected(index: int, scene: PackedScene)
 
 # ── Layout ────────────────────────────────────────────────────────────────────
 
@@ -251,4 +251,4 @@ func _on_slot_clicked(index: int) -> void:
 		_slots[_selected_index].set_selected(false)
 	_selected_index = index
 	_slots[index].set_selected(true)
-	turret_selected.emit(index)
+	turret_selected.emit(index, TURRET_ASSETS[index]["scene"])

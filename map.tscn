@@ -6,7 +6,8 @@
 [ext_resource type="Resource" uid="uid://ub8ponw0r6f8" path="res://biomes/biome_snow.tres" id="3_iw27f"]
 [ext_resource type="Resource" uid="uid://cgsne48ch7k6g" path="res://biomes/biome_grass.tres" id="4_iw27f"]
 [ext_resource type="Resource" uid="uid://dkkpml6w0got6" path="res://biomes/biome_desert.tres" id="5_iw27f"]
-[ext_resource type="PackedScene" path="res://UI/TurretHotbar.tscn" id="6_hotbar"]
+[ext_resource type="PackedScene" uid="uid://dc6dgdjoiagk6" path="res://UI/TurretHotbar.tscn" id="6_hotbar"]
+[ext_resource type="Script" uid="uid://dd8d348u4398d" path="res://scripts/BuilderController.gd" id="7_builder"]
 
 [node name="World" type="Node3D" unique_id=67285049]
 
@@ -29,3 +30,9 @@ transform = Transform3D(0.8660253, -0.35355332, 0.35355377, 0, 0.7071072, 0.7071
 shadow_enabled = true
 
 [node name="TurretHotbar" parent="." instance=ExtResource("6_hotbar")]
+
+[node name="BuilderController" type="Node" parent="." node_paths=PackedStringArray("map_generator")]
+script = ExtResource("7_builder")
+map_generator = NodePath("../Map")
+
+[connection signal="turret_selected" from="TurretHotbar" to="BuilderController" method="start_building"]

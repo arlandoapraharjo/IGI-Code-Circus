@@ -55,6 +55,9 @@ var enemy_path: Array[Vector2i] = []
 # O(1) lookup of position -> index in enemy_path (replaces .has()/.find())
 var path_lookup: Dictionary = {}
 
+# Tracks coordinates that contain decorations or turrets.
+var occupied_cells: Dictionary = {}
+
 var spawner_script = preload("res://scripts/Spawner.gd")
 
 # Batching containers for repeated static meshes
@@ -79,6 +82,18 @@ func _ready():
 	_generate_path()
 	_build_map()
 	_setup_spawner()
+
+func is_buildable(grid_pos: Vector2i) -> bool:
+	if grid_pos.x < 0 or grid_pos.x >= MAP_SIZE or grid_pos.y < 0 or grid_pos.y >= MAP_SIZE:
+		return false
+	if path_lookup.has(grid_pos):
+		return false
+	if occupied_cells.has(grid_pos):
+		return false
+	return true
+
+func occupy_cell(grid_pos: Vector2i) -> void:
+	occupied_cells[grid_pos] = true
 
 static var _current_biome_index: int = 0
 
@@ -330,6 +345,7 @@ func _build_map():
 				base_transforms.append(Transform3D(Basis(), origin))
 
 				if randf() < decoration_chance:
+					occupied_cells[pos] = true
 					var r = randf()
 					var rot_y = 0.0
 					if x == 0 or x == MAP_SIZE - 1 or z == 0 or z == MAP_SIZE - 1:
