@@ -13,7 +13,7 @@ func _ready():
 	target_position = global_position
 	initial_position = global_position
 
-func _process(delta):
+func _physics_process(delta):
 	var move_dir = Vector3.ZERO
 	
 	# Keyboard Movement (WASD or Arrow Keys)

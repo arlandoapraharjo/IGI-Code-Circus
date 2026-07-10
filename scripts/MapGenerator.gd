@@ -21,6 +21,10 @@ const BORDER_HEIGHT_STEP = 0.15 # height down
 ## Drag the scene's WorldEnvironment node here so the generator can swap in
 ## the active biome's Environment resource.
 @export var world_environment_node: WorldEnvironment
+
+## Emitted after a biome is applied. Listeners receive the active BiomeData.
+signal biome_changed(biome: BiomeData)
+
 ## Coastal Style
 @export var border_noise_frequency: float = 0.9 # contour coastal
 @export var border_noise_type: FastNoiseLite.NoiseType = FastNoiseLite.TYPE_PERLIN
@@ -39,6 +43,8 @@ var tree_large_model: PackedScene
 var rock_model: PackedScene
 var bush_model: PackedScene
 var decoration_chance: float = 0.2
+var active_biome: BiomeData = null
+
 ## Coastal
 var mm_border: MultiMeshInstance3D
 var border_noise := FastNoiseLite.new()
@@ -86,6 +92,7 @@ func _pick_biome() -> BiomeData:
 	return biome
 
 func _apply_biome(biome: BiomeData) -> void:
+	active_biome = biome
 	tile_base = biome.tile_base
 	tile_straight = biome.tile_straight
 	tile_corner = biome.tile_corner
@@ -101,6 +108,8 @@ func _apply_biome(biome: BiomeData) -> void:
 
 	if world_environment_node != null and biome.environment != null:
 		world_environment_node.environment = biome.environment
+
+	biome_changed.emit(biome)
 
 var target_end: Vector2i
 
@@ -432,6 +441,7 @@ func _extract_mesh_and_material(scene: PackedScene) -> Dictionary:
 func _make_multimesh_node(node_name: String, scene: PackedScene) -> MultiMeshInstance3D:
 	var mmi = MultiMeshInstance3D.new()
 	mmi.name = node_name
+	mmi.physics_interpolation_mode = 2 # Node.PHYSICS_INTERPOLATION_MODE_OFF
 	add_child(mmi)
 
 	var extracted = _extract_mesh_and_material(scene)
@@ -456,6 +466,7 @@ func _make_bush_variant_nodes(scene: PackedScene, count: int) -> Array[MultiMesh
 	for i in range(count):
 		var mmi = MultiMeshInstance3D.new()
 		mmi.name = "Bushes_Variant%d" % i
+		mmi.physics_interpolation_mode = 2 # Node.PHYSICS_INTERPOLATION_MODE_OFF
 		add_child(mmi)
 
 		var mm = MultiMesh.new()
