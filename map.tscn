@@ -7,7 +7,7 @@
 [ext_resource type="Resource" uid="uid://cgsne48ch7k6g" path="res://biomes/biome_grass.tres" id="4_iw27f"]
 [ext_resource type="Resource" uid="uid://dkkpml6w0got6" path="res://biomes/biome_desert.tres" id="5_iw27f"]
 [ext_resource type="PackedScene" uid="uid://dc6dgdjoiagk6" path="res://UI/TurretHotbar.tscn" id="6_hotbar"]
-[ext_resource type="Script" uid="uid://dd8d348u4398d" path="res://scripts/BuilderController.gd" id="7_builder"]
+[ext_resource type="Script" path="res://scripts/BuilderController.gd" id="7_builder"]
 
 [node name="World" type="Node3D" unique_id=67285049]
 

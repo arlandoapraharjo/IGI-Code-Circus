@@ -3,6 +3,7 @@ extends Node
 ## Controller that handles grid-snapping turret placement on the map.
 
 @export var map_generator: Node3D
+@export var turret_y_offset: float = 0.1
 
 var _is_building: bool = false
 var _turret_scene: PackedScene = null
@@ -19,7 +20,7 @@ func _ready() -> void:
 		_ghost_material.shader = shader
 		_ghost_material.set_shader_parameter("base_color", COLOR_VALID)
 
-func start_building(index: int, turret_scene: PackedScene) -> void:
+func start_building(_index: int, turret_scene: PackedScene) -> void:
 	if not map_generator:
 		push_warning("BuilderController: map_generator is not assigned!")
 		return
@@ -85,7 +86,7 @@ func _process(_delta: float) -> void:
 		var grid_pos = Vector2i(int(grid_x), int(grid_z))
 		
 		# Move ghost to snapped local position relative to Map, then convert back to global
-		var local_snap_pos = Vector3(grid_pos.x, 0.0, grid_pos.y)
+		var local_snap_pos = Vector3(grid_pos.x, turret_y_offset, grid_pos.y)
 		_ghost_instance.global_position = map_generator.to_global(local_snap_pos)
 		
 		var can_build = false
@@ -111,7 +112,7 @@ func _try_place_turret() -> void:
 		# Valid placement!
 		var new_turret = _turret_scene.instantiate()
 		map_generator.add_child(new_turret)
-		new_turret.position = Vector3(grid_pos.x, 0.0, grid_pos.y)
+		new_turret.position = Vector3(grid_pos.x, turret_y_offset, grid_pos.y)
 		
 		if map_generator.has_method("occupy_cell"):
 			map_generator.occupy_cell(grid_pos)
