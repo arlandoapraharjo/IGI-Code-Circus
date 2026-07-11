@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://8yl2cyvdmycj" path="res://assets/Models/GLB format/desert/desert-tile-straight.tscn" id="9_tttv0"]
 [ext_resource type="PackedScene" uid="uid://c2lgwekgawysn" path="res://assets/Models/GLB format/desert/kaktusss.glb" id="10_kqa02"]
 [ext_resource type="PackedScene" uid="uid://dmll0q7v1mikg" path="res://assets/Models/GLB format/desert/Kaktus cilikkk.glb" id="11_kqa02"]
+[ext_resource type="Resource" path="res://UI/hotbar_theme_desert.tres" id="12_desert"]
 
 [resource]
 script = ExtResource("1_725qa")
@@ -25,4 +26,5 @@ rock_model = ExtResource("3_oq5im")
 bush_model = ExtResource("1_oq5im")
 environment = ExtResource("1_kqj8a")
 has_heat_distortion = true
+hotbar_theme = ExtResource("12_desert")
 metadata/_custom_type_script = "uid://dt3mmbm7kd8rn"

@@ -40,7 +40,7 @@ biome resource files you create. Each `.tres` file represents one biome
    - In the Inspector, find the **Biomes** array export.
    - Add your `.tres` file(s) to the array.
    - Optionally set **Forced Biome Index** to test a specific biome
-     (0-indexed, -1 = random each run).
+	 (0-indexed, -1 = random each run).
 
 ---
 

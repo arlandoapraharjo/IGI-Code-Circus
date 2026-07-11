@@ -13,7 +13,7 @@ func _ready():
 	target_position = global_position
 	initial_position = global_position
 
-func _physics_process(delta):
+func _process(delta):
 	var move_dir = Vector3.ZERO
 	
 	# Keyboard Movement (WASD or Arrow Keys)
@@ -58,9 +58,6 @@ func _physics_process(delta):
 	global_position = global_position.lerp(target_position, 10.0 * delta)
 
 func _unhandled_input(event):
-	if event is InputEventKey and event.pressed and event.keycode == KEY_R:
-		get_tree().reload_current_scene()
-		
 	if event is InputEventMouseButton and event.pressed:
 		var zoom_dir = Vector3.ZERO
 		

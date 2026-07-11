@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://38nk5i8vrf66" path="res://assets/Models/GLB format/snow/snow-tile-straight.glb" id="7_wh0ca"]
 [ext_resource type="PackedScene" uid="uid://c58bkhmbqu1uq" path="res://assets/Models/GLB format/snow/snow-tile-tree-quad.glb" id="10_hl46c"]
 [ext_resource type="PackedScene" uid="uid://b45namaxsgl8f" path="res://assets/Models/GLB format/snow/snow-detail-tree.glb" id="11_wh0ca"]
+[ext_resource type="Resource" path="res://UI/hotbar_theme_snow.tres" id="12_snow"]
 
 [resource]
 script = ExtResource("1_87pvo")
@@ -24,4 +25,5 @@ tree_large_model = ExtResource("10_hl46c")
 rock_model = ExtResource("3_wh0ca")
 bush_model = ExtResource("1_4f7rl")
 environment = ExtResource("1_tbtkb")
+hotbar_theme = ExtResource("12_snow")
 metadata/_custom_type_script = "uid://dt3mmbm7kd8rn"

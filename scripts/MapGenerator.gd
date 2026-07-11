@@ -21,6 +21,10 @@ const BORDER_HEIGHT_STEP = 0.15 # height down
 ## Drag the scene's WorldEnvironment node here so the generator can swap in
 ## the active biome's Environment resource.
 @export var world_environment_node: WorldEnvironment
+
+## Emitted after a biome is applied. Listeners receive the active BiomeData.
+signal biome_changed(biome: BiomeData)
+
 ## Coastal Style
 @export var border_noise_frequency: float = 0.9 # contour coastal
 @export var border_noise_type: FastNoiseLite.NoiseType = FastNoiseLite.TYPE_PERLIN
@@ -39,6 +43,8 @@ var tree_large_model: PackedScene
 var rock_model: PackedScene
 var bush_model: PackedScene
 var decoration_chance: float = 0.2
+var active_biome: BiomeData = null
+
 ## Coastal
 var mm_border: MultiMeshInstance3D
 var border_noise := FastNoiseLite.new()
@@ -48,6 +54,9 @@ var border_noise_detail := FastNoiseLite.new()
 var enemy_path: Array[Vector2i] = []
 # O(1) lookup of position -> index in enemy_path (replaces .has()/.find())
 var path_lookup: Dictionary = {}
+
+# Tracks coordinates that contain decorations or turrets.
+var occupied_cells: Dictionary = {}
 
 var spawner_script = preload("res://scripts/Spawner.gd")
 
@@ -74,6 +83,18 @@ func _ready():
 	_build_map()
 	_setup_spawner()
 
+func is_buildable(grid_pos: Vector2i) -> bool:
+	if grid_pos.x < 0 or grid_pos.x >= MAP_SIZE or grid_pos.y < 0 or grid_pos.y >= MAP_SIZE:
+		return false
+	if path_lookup.has(grid_pos):
+		return false
+	if occupied_cells.has(grid_pos):
+		return false
+	return true
+
+func occupy_cell(grid_pos: Vector2i) -> void:
+	occupied_cells[grid_pos] = true
+
 static var _current_biome_index: int = 0
 
 func _pick_biome() -> BiomeData:
@@ -86,6 +107,7 @@ func _pick_biome() -> BiomeData:
 	return biome
 
 func _apply_biome(biome: BiomeData) -> void:
+	active_biome = biome
 	tile_base = biome.tile_base
 	tile_straight = biome.tile_straight
 	tile_corner = biome.tile_corner
@@ -101,6 +123,8 @@ func _apply_biome(biome: BiomeData) -> void:
 
 	if world_environment_node != null and biome.environment != null:
 		world_environment_node.environment = biome.environment
+
+	biome_changed.emit(biome)
 
 	var heat_distortion = get_node_or_null("../MeshInstance3D")
 	if heat_distortion:
@@ -325,6 +349,7 @@ func _build_map():
 				base_transforms.append(Transform3D(Basis(), origin))
 
 				if randf() < decoration_chance:
+					occupied_cells[pos] = true
 					var r = randf()
 					var rot_y = 0.0
 					if x == 0 or x == MAP_SIZE - 1 or z == 0 or z == MAP_SIZE - 1:
@@ -436,6 +461,7 @@ func _extract_mesh_and_material(scene: PackedScene) -> Dictionary:
 func _make_multimesh_node(node_name: String, scene: PackedScene) -> MultiMeshInstance3D:
 	var mmi = MultiMeshInstance3D.new()
 	mmi.name = node_name
+	mmi.physics_interpolation_mode = 2 # Node.PHYSICS_INTERPOLATION_MODE_OFF
 	add_child(mmi)
 
 	var extracted = _extract_mesh_and_material(scene)
@@ -460,6 +486,7 @@ func _make_bush_variant_nodes(scene: PackedScene, count: int) -> Array[MultiMesh
 	for i in range(count):
 		var mmi = MultiMeshInstance3D.new()
 		mmi.name = "Bushes_Variant%d" % i
+		mmi.physics_interpolation_mode = 2 # Node.PHYSICS_INTERPOLATION_MODE_OFF
 		add_child(mmi)
 
 		var mm = MultiMesh.new()

@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://b768hkoiusged"]
+
+[ext_resource type="Script" uid="uid://vca8f7oohn30" path="res://Snow-Stage/SnowMapGenerator.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://byp7p3p447u7h" path="res://Snow-Stage/CameraController.gd" id="2_camera_script"]
+
+[node name="World" type="Node3D" unique_id=67285049]
+
+[node name="Map" type="Node3D" parent="." unique_id=1197104861]
+script = ExtResource("1_script")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=191958186]
+transform = Transform3D(1, 0, 0, 0, 0.6729436, 0.7396938, 0, -0.7396938, 0.6729436, 7.433077, 9.972796, 18.059446)
+current = true
+fov = 54.84376
+script = ExtResource("2_camera_script")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=240699733]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 10, 0)
+shadow_enabled = true
