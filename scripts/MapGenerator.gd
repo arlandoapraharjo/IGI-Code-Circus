@@ -7,11 +7,21 @@ const MAX_ROUTE_RETRIES = 10 # how many times to re-roll the zigzag if a leg get
 const BUSH_VARIANT_COUNT = 4 # how many randomized wind/wiggle presets to spread bushes across
 const BUSH_SCALE_MIN = 0.5 # smallest random bush size (1.0 = original mesh size)
 const BUSH_SCALE_MAX = 0.75 # largest random bush size
-const BUSH_CAST_SHADOWS = false # alpha-blended wind-animated shadows are expensive for how little bushes contribute visually
+const BUSH_CAST_SHADOWS = true # alpha-blended wind-animated shadows are expensive for how little bushes contribute visually
 const BUSH_VISIBILITY_END = 35.0 # bushes fully disappear past this distance
 const BUSH_VISIBILITY_FADE = 6.0 # distance over which they fade out, instead of popping
 const BORDER_WIDTH = 4 # ring coast
 const BORDER_HEIGHT_STEP = 0.15 # height down
+const OCEAN_FLOOR_Y = -5.0 # world Y the outermost coastline ring extrudes down to, so it seams cleanly into the ocean mesh with no visible gap
+const BORDER_OUTER_EDGE_BAND = 1.5 # cells within this ring-distance of their local (noise-modulated) max ring count as "the coastline edge" -> get the deep extrusion to OCEAN_FLOOR_Y
+const BORDER_INNER_WALL_DEPTH = 1.2 # base thickness for interior coastal ring tiles - just enough to read as solid blocks instead of paper-thin floating tiles
+const BORDER_WALL_CAST_SHADOWS = true # cliff faces benefit from self-shadowing; flip off if it costs too much
+const BORDER_WALL_FALLBACK_COLOR = Color("c3643dff") # used only if we can't read the tile texture's pixels at all
+## Optional manual color for the coastal cliff walls. Leave alpha at 0 to
+## auto-derive a color from the average of the coastal tile's own texture
+## (keeps it roughly matched to whichever biome is active). Set alpha > 0
+## to force a specific color instead.
+@export var border_wall_color_override: Color = Color(0, 0, 0, 0)
 ## Assign one or more BiomeData resources in the Inspector (one per biome —
 ## e.g. biome_snow.tres, biome_desert.tres, biome_grass.tres). One is picked
 ## at random each run. To force a specific biome instead of random, leave
@@ -47,6 +57,8 @@ var active_biome: BiomeData = null
 
 ## Coastal
 var mm_border: MultiMeshInstance3D
+var mm_border_wall: MultiMeshInstance3D
+var mm_border_wall_outer: MultiMeshInstance3D
 var border_noise := FastNoiseLite.new()
 var border_noise_detail := FastNoiseLite.new()
 ##
@@ -383,7 +395,12 @@ func _build_map():
 
 func _build_coastal_border():
 	mm_border = _make_multimesh_node("CoastalBorder", tile_base)
+	mm_border_wall = _make_border_wall_node("CoastalBorderWalls")
+	mm_border_wall_outer = _make_border_wall_node("CoastalBorderWallsOuter", true)
+
 	var border_transforms: Array[Transform3D] = []
+	var wall_transforms: Array[Transform3D] = []
+	var wall_outer_transforms: Array[Transform3D] = []
 
 	var center = Vector2(float(MAP_SIZE - 1) / 2.0, float(MAP_SIZE - 1) / 2.0)
 
@@ -426,7 +443,32 @@ func _build_coastal_border():
 			var origin = Vector3(x * TILE_SIZE, y, z * TILE_SIZE)
 			border_transforms.append(Transform3D(Basis(), origin))
 
+			# --- Extrusion ---------------------------------------------
+			# Only the outermost coastline band (close to this angle's own
+			# noise-modulated cutoff) plunges all the way to the ocean
+			# floor, so it seams cleanly into the ocean mesh with no gap.
+			# Everything behind it is a shallow, slightly-varied block —
+			# enough thickness to read as solid terraced stone instead of
+			# a floating paper-thin tile, without needlessly extruding
+			# every interior ring all the way down.
+			var is_outer_edge = (local_max_ring - ring) < BORDER_OUTER_EDGE_BAND
+			var depth = 0.0
+			if is_outer_edge:
+				depth = y - OCEAN_FLOOR_Y
+			else:
+				depth = BORDER_INNER_WALL_DEPTH + abs(n) * BORDER_HEIGHT_STEP
+			depth = max(depth, 0.1) # guard against a degenerate/zero-height box
+
+			var wall_basis = Basis().scaled(Vector3(1.0, depth, 1.0))
+			var wall_origin = Vector3(x * TILE_SIZE, y - depth * 0.5, z * TILE_SIZE)
+			if is_outer_edge:
+				wall_outer_transforms.append(Transform3D(wall_basis, wall_origin))
+			else:
+				wall_transforms.append(Transform3D(wall_basis, wall_origin))
+
 	_apply_multimesh(mm_border, border_transforms)
+	_apply_multimesh(mm_border_wall, wall_transforms)
+	_apply_multimesh(mm_border_wall_outer, wall_outer_transforms)
 
 func _extract_mesh_and_material(scene: PackedScene) -> Dictionary:
 	var temp = scene.instantiate()
@@ -475,6 +517,162 @@ func _make_multimesh_node(node_name: String, scene: PackedScene) -> MultiMeshIns
 		mmi.material_override = extracted["material"]
 
 	return mmi
+
+func _make_border_wall_node(node_name: String, remove_texture: bool = false) -> MultiMeshInstance3D:
+	# A single cheap BoxMesh (12 tris), GPU-instanced via MultiMesh, reused
+	# for every coastal cliff/wall segment regardless of its depth — the
+	# per-instance transform stretches it vertically, so tall outer-ring
+	# walls cost nothing extra over the shallow inner-ring ones.
+	var mmi = MultiMeshInstance3D.new()
+	mmi.name = node_name
+	mmi.physics_interpolation_mode = 2 # Node.PHYSICS_INTERPOLATION_MODE_OFF
+	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if BORDER_WALL_CAST_SHADOWS else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(mmi)
+
+	var uv_rect := _get_tile_uv_rect(tile_base)
+	var wall_mesh := _build_wall_mesh(uv_rect)
+
+	var mm = MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = wall_mesh
+	mmi.multimesh = mm
+
+	# Reuse the coastal tile's actual texture (not a StandardMaterial3D
+	# swap of the whole atlas material — that carries the tile mesh's own
+	# UVs, which don't apply to our box). All six faces of the wall mesh
+	# share the SAME uv_rect the tile itself uses on top, so instead of
+	# tiling weirdly or sampling the wrong part of the atlas, the image
+	# just stretches smoothly down the height of each instance.
+	var wall_mat := StandardMaterial3D.new()
+	wall_mat.cull_mode = BaseMaterial3D.CULL_DISABLED # geometry/winding isn't guaranteed consistent per face, so don't risk invisible faces
+	if border_wall_color_override.a > 0.0:
+		wall_mat.albedo_color = border_wall_color_override
+	else:
+		var extracted = _extract_mesh_and_material(tile_base)
+		var src_mat = extracted["material"]
+		if not remove_texture and src_mat is BaseMaterial3D and (src_mat as BaseMaterial3D).albedo_texture != null:
+			wall_mat.albedo_texture = (src_mat as BaseMaterial3D).albedo_texture
+		else:
+			wall_mat.albedo_color = _resolve_border_wall_color()
+	mmi.material_override = wall_mat
+
+	return mmi
+
+func _get_tile_uv_rect(scene: PackedScene) -> Rect2:
+	# Finds the actual UV sub-rectangle the tile mesh uses in its texture
+	# (Kenney packs share one atlas per prop pack, so a tile's art is
+	# usually a small sub-rect, not the full 0..1 square).
+	var temp = scene.instantiate()
+	var mesh_instance: MeshInstance3D = null
+	if temp is MeshInstance3D:
+		mesh_instance = temp
+	else:
+		for child in temp.get_children():
+			if child is MeshInstance3D:
+				mesh_instance = child
+				break
+
+	var rect = Rect2(0.0, 0.0, 1.0, 1.0) # fallback: assume full texture
+	if mesh_instance != null and mesh_instance.mesh != null and mesh_instance.mesh.get_surface_count() > 0:
+		var arrays = mesh_instance.mesh.surface_get_arrays(0)
+		var uvs: PackedVector2Array = arrays[Mesh.ARRAY_TEX_UV]
+		if uvs.size() > 0:
+			var min_uv = uvs[0]
+			var max_uv = uvs[0]
+			for uv in uvs:
+				min_uv.x = minf(min_uv.x, uv.x)
+				min_uv.y = minf(min_uv.y, uv.y)
+				max_uv.x = maxf(max_uv.x, uv.x)
+				max_uv.y = maxf(max_uv.y, uv.y)
+			rect = Rect2(min_uv, max_uv - min_uv)
+
+	temp.queue_free()
+	return rect
+
+func _build_wall_mesh(uv_rect: Rect2) -> ArrayMesh:
+	# A unit box (extents ±0.5, matching the old BoxMesh footprint) with
+	# every face mapped to the SAME uv_rect, so per-instance Y-scaling
+	# (done via transform, same as before) stretches that one rectangle
+	# of texture down the wall's height instead of tiling it.
+	var hx = TILE_SIZE * 0.5
+	var hz = TILE_SIZE * 0.5
+	var hy = 0.5
+
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+
+	var top = [Vector3(-hx, hy, -hz), Vector3(hx, hy, -hz), Vector3(hx, hy, hz), Vector3(-hx, hy, hz)]
+	var bottom = [Vector3(-hx, -hy, hz), Vector3(hx, -hy, hz), Vector3(hx, -hy, -hz), Vector3(-hx, -hy, -hz)]
+	var north = [Vector3(-hx, hy, -hz), Vector3(-hx, -hy, -hz), Vector3(hx, -hy, -hz), Vector3(hx, hy, -hz)]
+	var south = [Vector3(hx, hy, hz), Vector3(hx, -hy, hz), Vector3(-hx, -hy, hz), Vector3(-hx, hy, hz)]
+	var east = [Vector3(hx, hy, -hz), Vector3(hx, -hy, -hz), Vector3(hx, -hy, hz), Vector3(hx, hy, hz)]
+	var west = [Vector3(-hx, hy, hz), Vector3(-hx, -hy, hz), Vector3(-hx, -hy, -hz), Vector3(-hx, hy, -hz)]
+
+	_add_wall_quad(st, top, Vector3.UP, uv_rect)
+	_add_wall_quad(st, bottom, Vector3.DOWN, uv_rect)
+	_add_wall_quad(st, north, Vector3(0, 0, -1), uv_rect)
+	_add_wall_quad(st, south, Vector3(0, 0, 1), uv_rect)
+	_add_wall_quad(st, east, Vector3(1, 0, 0), uv_rect)
+	_add_wall_quad(st, west, Vector3(-1, 0, 0), uv_rect)
+
+	return st.commit()
+
+func _add_wall_quad(st: SurfaceTool, pts: Array, normal: Vector3, uv_rect: Rect2) -> void:
+	var uvs = [
+		Vector2(uv_rect.position.x, uv_rect.position.y),
+		Vector2(uv_rect.end.x, uv_rect.position.y),
+		Vector2(uv_rect.end.x, uv_rect.end.y),
+		Vector2(uv_rect.position.x, uv_rect.end.y),
+	]
+	var idx = [0, 1, 2, 0, 2, 3]
+	for i in idx:
+		st.set_normal(normal)
+		st.set_uv(uvs[i])
+		st.add_vertex(pts[i])
+
+func _resolve_border_wall_color() -> Color:
+	if border_wall_color_override.a > 0.0:
+		return border_wall_color_override
+
+	var extracted = _extract_mesh_and_material(tile_base)
+	var mat = extracted["material"]
+	if mat is BaseMaterial3D:
+		var tex: Texture2D = mat.albedo_texture
+		if tex != null:
+			var img := tex.get_image()
+			if img != null:
+				if img.is_compressed():
+					if img.decompress() != OK:
+						return BORDER_WALL_FALLBACK_COLOR
+				var w = img.get_width()
+				var h = img.get_height()
+				if w > 0 and h > 0:
+					var uv_rect = _get_tile_uv_rect(tile_base)
+					var start_x = int(uv_rect.position.x * w)
+					var start_y = int(uv_rect.position.y * h)
+					var end_x = int(uv_rect.end.x * w)
+					var end_y = int(uv_rect.end.y * h)
+					
+					var width_rect = end_x - start_x
+					var height_rect = end_y - start_y
+					
+					if width_rect > 0 and height_rect > 0:
+						var step_x = maxi(1, width_rect / 32)
+						var step_y = maxi(1, height_rect / 32)
+						var sum := Color(0.0, 0.0, 0.0)
+						var samples = 0
+						for yy in range(start_y, end_y, step_y):
+							for xx in range(start_x, end_x, step_x):
+								var px = img.get_pixel(xx, yy)
+								if px.a > 0.05: # skip transparent atlas padding so it doesn't drag the average toward black
+									sum += px
+									samples += 1
+						if samples > 0:
+							return Color(sum.r / samples, sum.g / samples, sum.b / samples, 1.0)
+		elif mat.albedo_color != null:
+			return mat.albedo_color
+
+	return BORDER_WALL_FALLBACK_COLOR
 
 func _make_bush_variant_nodes(scene: PackedScene, count: int) -> Array[MultiMeshInstance3D]:
 	var extracted = _extract_mesh_and_material(scene)

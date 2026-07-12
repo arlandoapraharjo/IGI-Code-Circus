@@ -7,8 +7,9 @@
 [ext_resource type="Resource" uid="uid://cgsne48ch7k6g" path="res://biomes/biome_grass.tres" id="4_iw27f"]
 [ext_resource type="Resource" uid="uid://dkkpml6w0got6" path="res://biomes/biome_desert.tres" id="5_iw27f"]
 [ext_resource type="PackedScene" uid="uid://dc6dgdjoiagk6" path="res://UI/TurretHotbar.tscn" id="6_hotbar"]
-[ext_resource type="Script" path="res://scripts/BuilderController.gd" id="7_builder"]
-[ext_resource type="Shader" uid="uid://d3dle2ki2bw12" path="res://heat-haze.gdshader" id="7_71pa8"]
+[ext_resource type="Shader" uid="uid://cq2tbmm5ge7br" path="res://addons/Shader/heat-haze.gdshader" id="7_71pa8"]
+[ext_resource type="Script" uid="uid://wguegcpphxbe" path="res://scripts/BuilderController.gd" id="7_builder"]
+[ext_resource type="Material" uid="uid://cr8yf6r3utjih" path="res://addons/Textures/water_mat.tres" id="10_oysan"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_qwqyf"]
 resource_local_to_scene = true
@@ -17,9 +18,6 @@ resource_local_to_scene = true
 resource_local_to_scene = true
 noise = SubResource("FastNoiseLite_qwqyf")
 seamless = true
-
-[sub_resource type="ViewportTexture" id="ViewportTexture_62yky"]
-viewport_path = NodePath("SubViewport")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_mti6b"]
 resource_local_to_scene = true
@@ -32,6 +30,19 @@ shader_parameter/strength = 0.005
 [sub_resource type="QuadMesh" id="QuadMesh_4kxuq"]
 size = Vector2(800, 400)
 
+[sub_resource type="PlaneMesh" id="PlaneMesh_m8r5s"]
+lightmap_size_hint = Vector2i(12, 12)
+material = ExtResource("10_oysan")
+subdivide_width = 20
+subdivide_depth = 20
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y6u0t"]
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.36937502, 0.4625975, 0.30141243, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_eotfe"]
+material = SubResource("StandardMaterial3D_y6u0t")
+
 [node name="World" type="Node3D" unique_id=67285049]
 
 [node name="WorldEnvironment2" type="WorldEnvironment" parent="." unique_id=483959264]
@@ -43,7 +54,7 @@ biomes = Array[ExtResource("2_urblq")]([ExtResource("3_iw27f"), ExtResource("4_i
 world_environment_node = NodePath("../WorldEnvironment2")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=191958186]
-transform = Transform3D(0.73845536, -0.498735, 0.453814, 0, 0.67301255, 0.7396311, -0.6743024, -0.54618454, 0.49698973, 20.682722, 11.92209, 21.398424)
+transform = Transform3D(0.73845536, -0.498735, 0.45381397, 0, 0.67301255, 0.7396311, -0.6743024, -0.54618454, 0.49698976, 23.950241, 11.92209, 23.774797)
 current = true
 fov = 66.80169
 script = ExtResource("2_p5pve")
@@ -52,7 +63,9 @@ script = ExtResource("2_p5pve")
 transform = Transform3D(0.8660253, -0.35355332, 0.35355377, 0, 0.7071072, 0.7071064, -0.50000024, -0.612372, 0.61237276, 23.904772, 26.098438, 32.629635)
 shadow_enabled = true
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=81203874]
+[node name="Heatwave" type="MeshInstance3D" parent="." unique_id=81203874]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.036003113, 9.536743e-07, 0.033112526)
+visible = false
 material_override = SubResource("ShaderMaterial_mti6b")
 mesh = SubResource("QuadMesh_4kxuq")
 
@@ -60,13 +73,19 @@ mesh = SubResource("QuadMesh_4kxuq")
 use_hdr_2d = true
 size = Vector2i(1152, 648)
 
-[node name="Camera3D" type="Camera3D" parent="SubViewport" unique_id=303465695]
+[node name="TurretHotbar" parent="." unique_id=730426218 instance=ExtResource("6_hotbar")]
 
-[node name="TurretHotbar" parent="." instance=ExtResource("6_hotbar")]
-
-[node name="BuilderController" type="Node" parent="." node_paths=PackedStringArray("map_generator")]
+[node name="BuilderController" type="Node" parent="." unique_id=1232673061 node_paths=PackedStringArray("map_generator")]
 script = ExtResource("7_builder")
 map_generator = NodePath("../Map")
+
+[node name="Ocean" type="MeshInstance3D" parent="." unique_id=321031919]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 0, -1, 0)
+mesh = SubResource("PlaneMesh_m8r5s")
+
+[node name="OceanFloor" type="MeshInstance3D" parent="." unique_id=42007401]
+transform = Transform3D(70, 0, 0, 0, 70, 0, 0, 0, 70, 0, -2.860489, 0)
+mesh = SubResource("PlaneMesh_eotfe")
 
 [connection signal="turret_selected" from="TurretHotbar" to="BuilderController" method="start_building"]
 [connection signal="building_stopped" from="BuilderController" to="TurretHotbar" method="_on_building_stopped"]

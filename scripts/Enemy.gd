@@ -18,6 +18,12 @@ func reset(waypoints: Array[Vector3], new_speed: float) -> void:
 	speed = new_speed
 	visible = true
 	set_physics_process(true)
+	
+	# Pop-up animation
+	scale = Vector3.ZERO
+	var tween = create_tween()
+	tween.tween_property(self, "scale", Vector3.ONE, 0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	
 	if not waypoints.is_empty():
 		position = waypoints[0]
 		if waypoints.size() > 1:
