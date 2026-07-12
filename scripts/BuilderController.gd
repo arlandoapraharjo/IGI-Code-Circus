@@ -10,6 +10,7 @@ var _turret_scene: PackedScene = null
 var _ghost_instance: Node3D = null
 var _ghost_material: ShaderMaterial = null
 var _range_marker_node: Node3D = null
+var _attack_range: float = 0.0
 
 signal building_stopped
 
@@ -32,22 +33,26 @@ func start_building(_index: int, turret_scene: PackedScene, attack_range: float 
 		push_warning("BuilderController: map_generator is not assigned!")
 		return
 
-	if _ghost_instance:
-		_ghost_instance.queue_free()
-		_ghost_instance = null
-
-	_turret_scene = turret_scene
-	_is_building = true
-
 	# Create the ghost instance
+	_turret_scene = turret_scene
+	_attack_range = attack_range
+	_is_building = true
 	_ghost_instance = turret_scene.instantiate()
 	_ghost_instance.name = "GhostTurret"
-	# We don't want the ghost to execute its logic (shooting, etc)
+	# Assign Turret base script and configure properties
+	var turret_script = load("res://scripts/Turret.gd")
+	if turret_script == null:
+		push_error("Failed to load Turret script at res://scripts/Turret.gd")
+	else:
+		_ghost_instance.set_script(turret_script)
+	_ghost_instance.attack_range = attack_range
+	# All facilities are single-target with 1s cooldown
+	_ghost_instance.is_aoe = false
+	_ghost_instance.cooldown = 1.0
+	# Disable ghost logic and apply ghost material
 	_disable_logic(_ghost_instance)
 	_apply_ghost_material(_ghost_instance)
-	
 	add_child(_ghost_instance)
-	
 	_build_range_marker(attack_range)
 
 func stop_building() -> void:
@@ -144,7 +149,8 @@ func _build_range_marker(attack_range: float) -> void:
 
 func _clear_range_marker() -> void:
 	for child in _range_marker_node.get_children():
-		child.queue_free()
+		_range_marker_node.remove_child(child)
+		child.free()
 
 func _try_place_turret() -> void:
 	if not is_instance_valid(_ghost_instance) or not _ghost_instance.visible:
@@ -156,12 +162,26 @@ func _try_place_turret() -> void:
 	if map_generator.has_method("is_buildable") and map_generator.is_buildable(grid_pos):
 		# Valid placement!
 		var new_turret = _turret_scene.instantiate()
+		# IMPORTANT: assign script BEFORE add_child so _ready() fires with Turret.gd
+		var turret_script = load("res://scripts/Turret.gd")
+		if turret_script != null:
+			new_turret.set_script(turret_script)
+			new_turret.attack_range = _attack_range
+			# All facilities are single-target with 1s cooldown
+			new_turret.is_aoe = false
+			new_turret.cooldown = 1.0
+		else:
+			push_error("Turret.gd failed to load")
+		# Now add to tree — this triggers _ready() on the Turret script
 		map_generator.add_child(new_turret)
 		new_turret.position = Vector3(grid_pos.x, turret_y_offset, grid_pos.y)
+		print("Placed turret: attack_range=", _attack_range)
 		
 		if map_generator.has_method("occupy_cell"):
 			map_generator.occupy_cell(grid_pos)
-			
+		# Refresh the range marker so no ghost tiles linger at the placement spot
+		_clear_range_marker()
+		_build_range_marker(_attack_range)
 		# Do not call stop_building() here so the user can place multiple turrets
 	else:
 		# Invalid placement, maybe play a sound
