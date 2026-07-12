@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://bpg8awe6kssxa"]
 
+[ext_resource type="Environment" uid="uid://eje2tefugyb2" path="res://addons/Shader/desert_env.tres" id="1_0t07s"]
 [ext_resource type="Script" uid="uid://vca8f7oohn30" path="res://scripts/MapGenerator.gd" id="1_e0an3"]
 [ext_resource type="Script" uid="uid://byp7p3p447u7h" path="res://scripts/CameraController.gd" id="2_p5pve"]
 [ext_resource type="Script" uid="uid://dt3mmbm7kd8rn" path="res://biomes/BiomeData.gd" id="2_urblq"]
@@ -7,9 +8,31 @@
 [ext_resource type="Resource" uid="uid://cgsne48ch7k6g" path="res://biomes/biome_grass.tres" id="4_iw27f"]
 [ext_resource type="Resource" uid="uid://dkkpml6w0got6" path="res://biomes/biome_desert.tres" id="5_iw27f"]
 [ext_resource type="PackedScene" uid="uid://dc6dgdjoiagk6" path="res://UI/TurretHotbar.tscn" id="6_hotbar"]
+[ext_resource type="Shader" uid="uid://8haud4yhw01k" path="res://addons/Shader/sandstrom.gdshader" id="7_6qsgm"]
 [ext_resource type="Shader" uid="uid://cq2tbmm5ge7br" path="res://addons/Shader/heat-haze.gdshader" id="7_71pa8"]
 [ext_resource type="Script" uid="uid://wguegcpphxbe" path="res://scripts/BuilderController.gd" id="7_builder"]
 [ext_resource type="Material" uid="uid://cr8yf6r3utjih" path="res://addons/Textures/water_mat.tres" id="10_oysan"]
+
+[sub_resource type="Gradient" id="Gradient_ooc2g"]
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_qwqyf"]
+gradient = SubResource("Gradient_ooc2g")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_62yky"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_mm1bc"]
+noise = SubResource("FastNoiseLite_62yky")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2wwcf"]
+shader = ExtResource("7_6qsgm")
+shader_parameter/noise_tex = SubResource("NoiseTexture2D_mm1bc")
+shader_parameter/noise_scale = 0.9999999747
+shader_parameter/flatness = 1.0
+shader_parameter/density = 0.9999999747
+shader_parameter/grad_tex = SubResource("GradientTexture1D_qwqyf")
+shader_parameter/emision = Color(0, 0, 0, 1)
+shader_parameter/fog_speed = 1.510000309225
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_qwqyf"]
 resource_local_to_scene = true
@@ -46,12 +69,17 @@ material = SubResource("StandardMaterial3D_y6u0t")
 [node name="World" type="Node3D" unique_id=67285049]
 
 [node name="WorldEnvironment2" type="WorldEnvironment" parent="." unique_id=483959264]
+environment = ExtResource("1_0t07s")
 
 [node name="Map" type="Node3D" parent="." unique_id=1197104861 node_paths=PackedStringArray("world_environment_node")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.90186214)
 script = ExtResource("1_e0an3")
 biomes = Array[ExtResource("2_urblq")]([ExtResource("3_iw27f"), ExtResource("4_iw27f"), ExtResource("5_iw27f")])
 world_environment_node = NodePath("../WorldEnvironment2")
+
+[node name="FogVolume" type="FogVolume" parent="Map" unique_id=2108782402]
+size = Vector3(20, 5, 20)
+material = SubResource("ShaderMaterial_2wwcf")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=191958186]
 transform = Transform3D(0.73845536, -0.498735, 0.45381397, 0, 0.67301255, 0.7396311, -0.6743024, -0.54618454, 0.49698976, 23.950241, 11.92209, 23.774797)

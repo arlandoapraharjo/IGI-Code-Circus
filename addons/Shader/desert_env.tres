@@ -12,3 +12,4 @@ sky_material = SubResource("ProceduralSkyMaterial_vyd8s")
 background_mode = 2
 sky = SubResource("1")
 ambient_light_source = 3
+volumetric_fog_enabled = true
