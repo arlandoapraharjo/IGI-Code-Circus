@@ -83,8 +83,11 @@ material = SubResource("ShaderMaterial_2wwcf")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=191958186]
 transform = Transform3D(0.73845536, -0.498735, 0.45381397, 0, 0.67301255, 0.7396311, -0.6743024, -0.54618454, 0.49698976, 23.950241, 11.92209, 23.774797)
+projection = 1
 current = true
 fov = 66.80169
+size = 20.0
+far = 150.0
 script = ExtResource("2_p5pve")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=240699733]
@@ -108,7 +111,7 @@ script = ExtResource("7_builder")
 map_generator = NodePath("../Map")
 
 [node name="Ocean" type="MeshInstance3D" parent="." unique_id=321031919]
-transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 0, -1, 0)
+transform = Transform3D(70, 0, 0, 0, 70, 0, 0, 0, 70, 0, -1, 0)
 mesh = SubResource("PlaneMesh_m8r5s")
 
 [node name="OceanFloor" type="MeshInstance3D" parent="." unique_id=42007401]

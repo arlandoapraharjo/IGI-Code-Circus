@@ -111,6 +111,10 @@ const TURRET_ASSETS: Array[Dictionary] = [
 
 var _slots: Array[Node] = []
 var _selected_index: int = -1
+var _is_open: bool = false
+var _toggle_btn: Button = null
+var _panel_tween: Tween = null
+var _panel_target_y: float = 0.0
 
 @onready var slot_container: HBoxContainer = $HotbarPanel/VBox/MarginContainer/SlotContainer
 @onready var hotbar_panel: PanelContainer  = $HotbarPanel
@@ -119,6 +123,8 @@ func _ready() -> void:
 	_rebuild_hotbar()
 	_apply_panel_style()
 	_populate_slots()
+	# Create the toggle button and set up popup behavior
+	call_deferred("_setup_popup")
 	# Auto-connect to MapGenerator so theme swaps when the biome changes
 	call_deferred("_connect_to_map_generator")
 
@@ -131,6 +137,108 @@ func _connect_to_map_generator() -> void:
 		# If map already initialized its biome before we connected, grab it now!
 		if "active_biome" in map and map.active_biome != null:
 			_on_biome_changed(map.active_biome)
+
+# ── Popup Toggle ───────────────────────────────────────────────────────────────
+
+func _setup_popup() -> void:
+	# Wait one frame so the panel has its final size
+	await get_tree().process_frame
+
+	# Store the panel's "open" Y position and hide it off-screen
+	_panel_target_y = hotbar_panel.position.y
+	hotbar_panel.position.y = hotbar_panel.position.y + hotbar_panel.size.y + 20
+	hotbar_panel.visible = true
+
+	# Create the toggle button at the bottom center
+	_toggle_btn = Button.new()
+	_toggle_btn.text = "▲ Turrets"
+	_toggle_btn.custom_minimum_size = Vector2(120, 32)
+	_toggle_btn.pressed.connect(_toggle_hotbar)
+	# Style the button to match the hotbar theme
+	_apply_toggle_style()
+	# Add as a sibling control so it lives in the same CanvasLayer
+	add_child(_toggle_btn)
+	# Position it at bottom center
+	_toggle_btn.anchor_left = 0.5
+	_toggle_btn.anchor_right = 0.5
+	_toggle_btn.anchor_top = 1.0
+	_toggle_btn.anchor_bottom = 1.0
+	_toggle_btn.offset_left = -60
+	_toggle_btn.offset_right = 60
+	_toggle_btn.offset_top = -32
+	_toggle_btn.offset_bottom = 0
+	_toggle_btn.grow_horizontal = Control.GROW_DIRECTION_BOTH
+
+func _apply_toggle_style() -> void:
+	var style_normal := StyleBoxFlat.new()
+	style_normal.bg_color = panel_bg_color
+	style_normal.border_color = panel_border_color
+	style_normal.set_border_width_all(2)
+	style_normal.corner_radius_top_left = 8
+	style_normal.corner_radius_top_right = 8
+	style_normal.corner_radius_bottom_left = 0
+	style_normal.corner_radius_bottom_right = 0
+	_toggle_btn.add_theme_stylebox_override("normal", style_normal)
+
+	var style_hover := style_normal.duplicate()
+	style_hover.bg_color = Color(panel_bg_color.r + 0.05, panel_bg_color.g + 0.05, panel_bg_color.b + 0.1, panel_bg_color.a)
+	style_hover.border_color = Color(panel_border_color.r, panel_border_color.g, panel_border_color.b, 1.0)
+	_toggle_btn.add_theme_stylebox_override("hover", style_hover)
+
+	var style_pressed := style_normal.duplicate()
+	style_pressed.bg_color = Color(panel_bg_color.r + 0.08, panel_bg_color.g + 0.08, panel_bg_color.b + 0.15, panel_bg_color.a)
+	_toggle_btn.add_theme_stylebox_override("pressed", style_pressed)
+
+	_toggle_btn.add_theme_color_override("font_color", panel_border_color)
+	_toggle_btn.add_theme_color_override("font_hover_color", Color(1, 1, 1, 1))
+
+func _toggle_hotbar() -> void:
+	if _is_open:
+		_hide_hotbar()
+	else:
+		_show_hotbar()
+
+func _show_hotbar() -> void:
+	if _is_open:
+		return
+	_is_open = true
+	_toggle_btn.text = "▼ Close"
+
+	if _panel_tween:
+		_panel_tween.kill()
+	_panel_tween = create_tween()
+	_panel_tween.set_ease(Tween.EASE_OUT)
+	_panel_tween.set_trans(Tween.TRANS_BACK)
+	# Slide panel up, push toggle button up above it
+	_panel_tween.tween_property(hotbar_panel, "position:y", _panel_target_y, 0.35)
+	_panel_tween.parallel().tween_property(_toggle_btn, "offset_top", -32 - hotbar_panel.size.y - 4, 0.35)
+	_panel_tween.parallel().tween_property(_toggle_btn, "offset_bottom", 0 - hotbar_panel.size.y - 4, 0.35)
+
+func _hide_hotbar() -> void:
+	if not _is_open:
+		return
+	_is_open = false
+	_toggle_btn.text = "▲ Turrets"
+
+	if _panel_tween:
+		_panel_tween.kill()
+	_panel_tween = create_tween()
+	_panel_tween.set_ease(Tween.EASE_IN)
+	_panel_tween.set_trans(Tween.TRANS_CUBIC)
+	# Slide panel back down off screen, toggle button returns to bottom
+	var hidden_y = _panel_target_y + hotbar_panel.size.y + 20
+	_panel_tween.tween_property(hotbar_panel, "position:y", hidden_y, 0.25)
+	_panel_tween.parallel().tween_property(_toggle_btn, "offset_top", -32, 0.25)
+	_panel_tween.parallel().tween_property(_toggle_btn, "offset_bottom", 0, 0.25)
+
+func _unhandled_input(event: InputEvent) -> void:
+	# Close the hotbar when clicking outside it
+	if _is_open and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		var panel_rect = hotbar_panel.get_global_rect()
+		var btn_rect = _toggle_btn.get_global_rect()
+		var mouse = event.position
+		if not panel_rect.has_point(mouse) and not btn_rect.has_point(mouse):
+			_hide_hotbar()
 
 # ── Build / Rebuild ────────────────────────────────────────────────────────────
 
@@ -245,6 +353,8 @@ func apply_biome_theme(theme: HotbarTheme) -> void:
 
 func _on_biome_changed(biome: BiomeData) -> void:
 	apply_biome_theme(biome.hotbar_theme)
+	if _toggle_btn:
+		_apply_toggle_style()
 
 func _on_slot_clicked(index: int) -> void:
 	if _selected_index == index:
@@ -264,3 +374,4 @@ func _on_building_stopped() -> void:
 	if _selected_index != -1 and _selected_index < _slots.size():
 		_slots[_selected_index].set_selected(false)
 		_selected_index = -1
+	_hide_hotbar()
