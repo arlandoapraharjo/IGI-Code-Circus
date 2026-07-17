@@ -1,15 +1,16 @@
-[gd_resource type="Resource" script_class="HotbarTheme" format=3]
+[gd_resource type="Resource" script_class="HotbarTheme" format=3 uid="uid://b1rex4wqywsql"]
 
 [ext_resource type="Script" uid="uid://ch4ytpvsh5nx8" path="res://UI/HotbarTheme.gd" id="1_desert"]
 
 [resource]
 script = ExtResource("1_desert")
-panel_bg_color = Color(0.08, 0.05, 0.01, 1.0)
+panel_bg_color = Color(0.1900416, 0.1179687, 0.020305185, 1)
 panel_border_color = Color(0.85, 0.65, 0.15, 0.8)
 panel_shadow_color = Color(0.7, 0.45, 0.05, 0.45)
 slot_color_bg_normal = Color(0.14, 0.09, 0.02, 0.88)
 slot_color_bg_hover = Color(0.22, 0.15, 0.04, 0.92)
 slot_color_bg_selected = Color(0.28, 0.18, 0.04, 0.96)
+slot_color_border_normal = Color(0.56059855, 0.20677638, 0.10607851, 0.6)
 slot_color_border_hover = Color(0.85, 0.62, 0.12, 0.9)
-slot_color_border_selected = Color(1.0, 0.8, 0.2, 1.0)
+slot_color_border_selected = Color(1, 0.8, 0.2, 1)
 slot_color_glow = Color(0.9, 0.65, 0.1, 0.55)

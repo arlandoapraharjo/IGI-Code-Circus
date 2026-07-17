@@ -94,7 +94,7 @@ func _rotate_toward_target(target: Node3D, delta: float) -> void:
 	var dir = Vector3(target_pos.x - my_pos.x, 0.0, target_pos.z - my_pos.z)
 	if dir.length_squared() < 0.0001:
 		return
-	var target_basis = Basis.looking_at(dir.normalized(), Vector3.UP)
+	var target_basis = Basis.looking_at(dir.normalized(), Vector3.UP, true)
 	# Slerp at rotation_speed degrees per second
 	var t = clampf(deg_to_rad(rotation_speed) * delta, 0.0, 1.0)
 	global_transform.basis = global_transform.basis.slerp(target_basis, t)

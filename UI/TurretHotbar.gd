@@ -118,6 +118,8 @@ var _panel_target_y: float = 0.0
 
 @onready var slot_container: HBoxContainer = $HotbarPanel/VBox/MarginContainer/SlotContainer
 @onready var hotbar_panel: PanelContainer  = $HotbarPanel
+@onready var border_overlay: TextureRect   = $HotbarPanel/VBox/MarginContainer/BorderOverlay
+@onready var bg_overlay: TextureRect       = $HotbarPanel/VBox/MarginContainer/BgOverlay
 
 func _ready() -> void:
 	_rebuild_hotbar()
@@ -260,10 +262,43 @@ func _rebuild_hotbar() -> void:
 	_push_colors_to_slots()
 	_apply_slot_spacing()
 
+var current_biome_folder: String = "Desert"
+var _biome_frames: Array[Texture2D] = []
+
+func _load_biome_frames() -> void:
+	_biome_frames.clear()
+	for i in range(2, 9):
+		var tex_path = "res://UI/%s/Sprite-000%d.png" % [current_biome_folder, i]
+		if ResourceLoader.exists(tex_path):
+			_biome_frames.append(load(tex_path))
+			
+	if is_node_ready() and border_overlay:
+		var border_path = "res://UI/%s/%s Border Trial 1.png" % [current_biome_folder, current_biome_folder]
+		if ResourceLoader.exists(border_path):
+			border_overlay.texture = load(border_path)
+			hotbar_panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+			# Optional: hide the title label if there's a custom pixel-art border
+			$HotbarPanel/VBox/TitleLabel.hide()
+		else:
+			border_overlay.texture = null
+			_apply_panel_style()
+			$HotbarPanel/VBox/TitleLabel.show()
+			
+	if is_node_ready() and bg_overlay:
+		var bg_path = "res://UI/%s/%s Border BG Trial 1.png" % [current_biome_folder, current_biome_folder]
+		if ResourceLoader.exists(bg_path):
+			bg_overlay.texture = load(bg_path)
+		else:
+			bg_overlay.texture = null
+
 func _populate_slots() -> void:
+	if _biome_frames.is_empty():
+		_load_biome_frames()
 	for i in range(min(TURRET_ASSETS.size(), _slots.size())):
 		var entry: Dictionary = TURRET_ASSETS[i]
 		set_slot_turret(i, entry["scene"], entry["name"])
+		if _slots[i].has_method("set_bg_frames"):
+			_slots[i].set_bg_frames(_biome_frames)
 
 # ── Style application ──────────────────────────────────────────────────────────
 
@@ -353,6 +388,13 @@ func apply_biome_theme(theme: HotbarTheme) -> void:
 
 func _on_biome_changed(biome: BiomeData) -> void:
 	apply_biome_theme(biome.hotbar_theme)
+	if biome.hotbar_theme != null:
+		var path = biome.hotbar_theme.resource_path.to_lower()
+		if path.find("desert") != -1: current_biome_folder = "Desert"
+		elif path.find("grass") != -1: current_biome_folder = "Grass"
+		elif path.find("snow") != -1 or path.find("ice") != -1: current_biome_folder = "Ice"
+	_load_biome_frames()
+	_populate_slots()
 	if _toggle_btn:
 		_apply_toggle_style()
 

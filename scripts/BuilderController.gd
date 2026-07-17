@@ -33,6 +33,9 @@ func start_building(_index: int, turret_scene: PackedScene, attack_range: float 
 		push_warning("BuilderController: map_generator is not assigned!")
 		return
 
+	if _is_building:
+		stop_building(false)
+
 	# Create the ghost instance
 	_turret_scene = turret_scene
 	_attack_range = attack_range
@@ -55,14 +58,15 @@ func start_building(_index: int, turret_scene: PackedScene, attack_range: float 
 	add_child(_ghost_instance)
 	_build_range_marker(attack_range)
 
-func stop_building() -> void:
+func stop_building(emit_signal: bool = true) -> void:
 	_is_building = false
 	_turret_scene = null
 	if _ghost_instance:
 		_ghost_instance.queue_free()
 		_ghost_instance = null
 	_clear_range_marker()
-	building_stopped.emit()
+	if emit_signal:
+		building_stopped.emit()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not _is_building:

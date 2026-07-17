@@ -1,6 +1,6 @@
 extends Node3D
 # Speed in tiles per second
-@export var speed: float = 1.0
+@export var speed: float = 0.65
 ## Rotations per second for the UFO spin animation
 @export var spin_speed: float = 0.25
 var path_waypoints: Array[Vector3] = []

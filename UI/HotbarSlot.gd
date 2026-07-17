@@ -62,9 +62,12 @@ var is_hovered: bool = false
 var _scale_tween: Tween = null
 var _rotate_tween: Tween = null
 var _turret_instance: Node3D = null
-var _style_normal: StyleBoxFlat
-var _style_hover: StyleBoxFlat
-var _style_selected: StyleBoxFlat
+
+var bg_frames: Array[Texture2D] = []
+var bg_frame_index: int = 0
+var bg_timer: float = 0.0
+
+@onready var bg_texture: TextureRect = $BgTexture
 
 @onready var sub_viewport: SubViewport        = $MarginContainer/SubViewportContainer/SubViewport
 @onready var preview_camera: Camera3D         = $MarginContainer/SubViewportContainer/SubViewport/PreviewScene/Camera3D
@@ -73,8 +76,7 @@ var _style_selected: StyleBoxFlat
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(slot_size, slot_size)
-	_rebuild_styles()
-	add_theme_stylebox_override("panel", _style_normal)
+	add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	tooltip_label.hide()
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
@@ -86,33 +88,7 @@ func _ready() -> void:
 # ── Style ─────────────────────────────────────────────────────────────────────
 
 func _rebuild_styles() -> void:
-	if not is_node_ready():
-		return
-	_style_normal   = _make_style(color_bg_normal,   color_border_normal,   border_width_normal,   0.0)
-	_style_hover    = _make_style(color_bg_hover,    color_border_hover,    border_width_hover,    4.0)
-	_style_selected = _make_style(color_bg_selected, color_border_selected, border_width_selected, float(glow_shadow_size))
-	_style_selected.shadow_color = color_glow
-	# Apply current state style immediately
-	if is_selected:
-		add_theme_stylebox_override("panel", _style_selected)
-	elif is_hovered:
-		add_theme_stylebox_override("panel", _style_hover)
-	else:
-		add_theme_stylebox_override("panel", _style_normal)
-
-func _make_style(bg: Color, border: Color, bw: float, shadow: float) -> StyleBoxFlat:
-	var s := StyleBoxFlat.new()
-	s.bg_color    = bg
-	s.border_color = border
-	s.set_border_width_all(int(bw))
-	s.corner_radius_top_left     = corner_radius
-	s.corner_radius_top_right    = corner_radius
-	s.corner_radius_bottom_left  = corner_radius
-	s.corner_radius_bottom_right = corner_radius
-	s.shadow_color  = Color(border.r, border.g, border.b, 0.40)
-	s.shadow_size   = int(shadow)
-	s.shadow_offset = Vector2.ZERO
-	return s
+	pass
 
 # ── Public API ────────────────────────────────────────────────────────────────
 
@@ -205,17 +181,36 @@ func set_selected(value: bool) -> void:
 	is_selected = value
 	_refresh_visual()
 
+func set_bg_frames(frames: Array[Texture2D]) -> void:
+	bg_frames = frames
+	_refresh_visual()
+
+func _process(delta: float) -> void:
+	if bg_frames.is_empty() or not is_selected:
+		return
+	bg_timer += delta
+	if bg_timer >= 0.1:
+		bg_timer = 0.0
+		bg_frame_index = (bg_frame_index + 1) % bg_frames.size()
+		bg_texture.texture = bg_frames[bg_frame_index]
+
 func _refresh_visual() -> void:
 	if not is_node_ready():
 		return
+	
+	if bg_frames.size() > 0:
+		if is_selected:
+			pass # _process handles animation
+		else:
+			bg_texture.texture = bg_frames[0]
+			bg_frame_index = 0
+			bg_timer = 0.0
+			
 	if is_selected:
-		add_theme_stylebox_override("panel", _style_selected)
 		_animate_scale(1.08)
 	elif is_hovered:
-		add_theme_stylebox_override("panel", _style_hover)
 		_animate_scale(1.03)
 	else:
-		add_theme_stylebox_override("panel", _style_normal)
 		_animate_scale(1.0)
 
 func _animate_scale(target: float) -> void:

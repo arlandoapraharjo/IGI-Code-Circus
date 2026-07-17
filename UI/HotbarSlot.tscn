@@ -1,6 +1,15 @@
-[gd_scene format=3 uid="uid://hotbar_slot_001"]
+[gd_scene format=3 uid="uid://14xtdro5tc7m"]
 
-[ext_resource type="Script" path="res://UI/HotbarSlot.gd" id="1_slot"]
+[ext_resource type="Script" uid="uid://b64sdroxxtpdf" path="res://UI/HotbarSlot.gd" id="1_slot"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nmgbl"]
+
+[sub_resource type="Environment" id="Environment_preview"]
+background_mode = 1
+background_color = Color(0.03, 0.05, 0.12, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.25, 0.55, 1, 1)
+ambient_light_energy = 0.6
 
 [sub_resource type="LabelSettings" id="LabelSettings_tooltip"]
 font_size = 11
@@ -8,68 +17,58 @@ font_color = Color(0.6, 0.88, 1, 1)
 outline_size = 2
 outline_color = Color(0, 0, 0, 0.8)
 
-[sub_resource type="Environment" id="Environment_preview"]
-background_mode = 1
-background_color = Color(0.03, 0.05, 0.12, 1)
-ambient_light_source = 2
-ambient_light_color = Color(0.25, 0.55, 1.0, 1)
-ambient_light_energy = 0.6
-
-[node name="HotbarSlot" type="PanelContainer"]
-custom_minimum_size = Vector2(82, 82)
-mouse_filter = 0
+[node name="HotbarSlot" type="PanelContainer" unique_id=275498925]
+custom_minimum_size = Vector2(50, 50)
+theme_override_styles/panel = SubResource("StyleBoxEmpty_nmgbl")
 script = ExtResource("1_slot")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="BgTexture" type="TextureRect" parent="." unique_id=2052921674]
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1707221211]
 layout_mode = 2
 theme_override_constants/margin_left = 5
-theme_override_constants/margin_right = 5
 theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="SubViewportContainer" type="SubViewportContainer" parent="MarginContainer"]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="MarginContainer" unique_id=269245654]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 stretch = true
 
-[node name="SubViewport" type="SubViewport" parent="MarginContainer/SubViewportContainer"]
+[node name="SubViewport" type="SubViewport" parent="MarginContainer/SubViewportContainer" unique_id=574790715]
 own_world_3d = true
-size = Vector2i(72, 72)
+handle_input_locally = false
+size = Vector2i(40, 40)
 render_target_update_mode = 4
 
-[node name="PreviewScene" type="Node3D" parent="MarginContainer/SubViewportContainer/SubViewport"]
+[node name="PreviewScene" type="Node3D" parent="MarginContainer/SubViewportContainer/SubViewport" unique_id=1233361463]
 
-[node name="Camera3D" type="Camera3D" parent="MarginContainer/SubViewportContainer/SubViewport/PreviewScene"]
-transform = Transform3D(1, 0, 0, 0, 0.857, -0.515, 0, 0.515, 0.857, 0, 2.0, 3.0)
-fov = 45.0
+[node name="Camera3D" type="Camera3D" parent="MarginContainer/SubViewportContainer/SubViewport/PreviewScene" unique_id=909442324]
+transform = Transform3D(1, 0, 0, 0, 0.857, -0.515, 0, 0.515, 0.857, 0, 2, 3)
 environment = SubResource("Environment_preview")
+fov = 45.0
 
-[node name="TurretAnchor" type="Node3D" parent="MarginContainer/SubViewportContainer/SubViewport/PreviewScene"]
+[node name="TurretAnchor" type="Node3D" parent="MarginContainer/SubViewportContainer/SubViewport/PreviewScene" unique_id=159330962]
 
-[node name="KeyLight" type="DirectionalLight3D" parent="MarginContainer/SubViewportContainer/SubViewport/PreviewScene"]
+[node name="KeyLight" type="DirectionalLight3D" parent="MarginContainer/SubViewportContainer/SubViewport/PreviewScene" unique_id=1245862266]
 transform = Transform3D(0.866, -0.354, 0.354, 0, 0.707, 0.707, -0.5, -0.612, 0.612, 0, 0, 0)
 light_color = Color(0.9, 0.95, 1, 1)
 light_energy = 1.8
-shadow_enabled = false
 
-[node name="FillLight" type="OmniLight3D" parent="MarginContainer/SubViewportContainer/SubViewport/PreviewScene"]
+[node name="FillLight" type="OmniLight3D" parent="MarginContainer/SubViewportContainer/SubViewport/PreviewScene" unique_id=1032055101]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1, -1)
-light_color = Color(0.3, 0.6, 1.0, 1)
+light_color = Color(0.3, 0.6, 1, 1)
 light_energy = 1.2
 omni_range = 10.0
 
-[node name="TooltipLabel" type="Label" parent="."]
-layout_mode = 1
-anchors_preset = 6
-anchor_top = 0.0
-anchor_bottom = 0.0
-offset_left = 0
-offset_right = 82
-offset_top = -22
-offset_bottom = -4
-text = ""
+[node name="TooltipLabel" type="Label" parent="." unique_id=1265599258]
+visible = false
+z_index = 10
+layout_mode = 2
 label_settings = SubResource("LabelSettings_tooltip")
 horizontal_alignment = 1
-z_index = 10
-mouse_filter = 2

@@ -9,9 +9,8 @@
 [ext_resource type="PackedScene" uid="uid://c83x5v4542cgj" path="res://assets/Models/GLB format/desert/desert-tile-spawnend.tscn" id="7_nk1r8"]
 [ext_resource type="PackedScene" uid="uid://6ljpwl3pkb5l" path="res://assets/Models/GLB format/desert/desert-tile-spawn.tscn" id="8_vpp5a"]
 [ext_resource type="PackedScene" uid="uid://8yl2cyvdmycj" path="res://assets/Models/GLB format/desert/desert-tile-straight.tscn" id="9_tttv0"]
-[ext_resource type="PackedScene" uid="uid://c2lgwekgawysn" path="res://assets/Models/GLB format/desert/kaktusss.glb" id="10_kqa02"]
-[ext_resource type="PackedScene" uid="uid://dmll0q7v1mikg" path="res://assets/Models/GLB format/desert/Kaktus cilikkk.glb" id="11_kqa02"]
-[ext_resource type="Resource" path="res://UI/hotbar_theme_desert.tres" id="12_desert"]
+[ext_resource type="PackedScene" uid="uid://d2pxuqb8xalnw" path="res://assets/Models/GLB format/desert/Cactuss.glb" id="10_oq5im"]
+[ext_resource type="Resource" uid="uid://b1rex4wqywsql" path="res://UI/hotbar_theme_desert.tres" id="11_theme"]
 
 [resource]
 script = ExtResource("1_725qa")
@@ -20,11 +19,11 @@ tile_straight = ExtResource("9_tttv0")
 tile_corner = ExtResource("6_ej4pw")
 tile_spawn = ExtResource("8_vpp5a")
 tile_end = ExtResource("7_nk1r8")
-tree_model = ExtResource("11_kqa02")
-tree_large_model = ExtResource("10_kqa02")
+tree_model = ExtResource("10_oq5im")
+tree_large_model = ExtResource("10_oq5im")
 rock_model = ExtResource("3_oq5im")
 bush_model = ExtResource("1_oq5im")
 environment = ExtResource("1_kqj8a")
 has_heat_distortion = true
-hotbar_theme = ExtResource("12_desert")
+hotbar_theme = ExtResource("11_theme")
 metadata/_custom_type_script = "uid://dt3mmbm7kd8rn"
