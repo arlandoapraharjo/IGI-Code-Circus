@@ -163,9 +163,27 @@ func _physics_process(delta):
 		var speed_factor = target_ortho_size / max_ortho_size
 		target_position += Vector3(move_dir.x, 0, move_dir.z) * move_speed * speed_factor * delta
 
-	# Clamp target within map boundaries
-	target_position.x = clampf(target_position.x, _bounds_min.x, _bounds_max.x)
-	target_position.z = clampf(target_position.z, _bounds_min.z, _bounds_max.z)
+	# Calculate dynamic bounds: the base bounds (_bounds_min/max) apply when fully zoomed out.
+	# As we zoom in (screen shrinks), we expand the allowed camera center position by exactly
+	# the amount the screen shrank in world space, keeping the visible ocean border constant.
+	var vp = get_viewport()
+	var aspect = 1.0
+	if vp and vp.size.y > 0:
+		aspect = float(vp.size.x) / float(vp.size.y)
+	var pitch_factor = 0.72
+	
+	var ortho_diff = max_ortho_size - target_ortho_size
+	var extra_pan_x = (ortho_diff * aspect) / 2.0
+	var extra_pan_z = (ortho_diff / pitch_factor) / 2.0
+	
+	var current_min_x = _bounds_min.x - extra_pan_x
+	var current_max_x = _bounds_max.x + extra_pan_x
+	var current_min_z = _bounds_min.z - extra_pan_z
+	var current_max_z = _bounds_max.z + extra_pan_z
+
+	# Clamp target within dynamic boundaries
+	target_position.x = clampf(target_position.x, current_min_x, current_max_x)
+	target_position.z = clampf(target_position.z, current_min_z, current_max_z)
 
 	# Smoothly interpolate position
 	global_position = global_position.lerp(target_position, 10.0 * delta)
