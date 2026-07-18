@@ -5,7 +5,7 @@ render_mode shadows_disabled;
 #define FRESNEL
 #define PLAYER_WAVES
 #define DISPLACEMENT
-#define SSR
+//#define SSR
 
 group_uniforms color;
 uniform vec3 absorption_color : source_color = vec3(1.0, 0.35, 0.0);
@@ -168,8 +168,8 @@ float fresnel(vec3 normal, vec3 view) {
 
 
 vec2 refract_uv(inout vec2 uv, vec3 normal, float depth){
-	float strength1 = refraction_strength * depth;
-	uv += fma(strength1, length(normal), strength1 * -1.2);
+	float strength1 = refraction_strength * depth * 0.02;
+	uv += (normal.xy * 2.0 - 1.0) * strength1;
 	return uv;
 }
 
@@ -275,7 +275,9 @@ void fragment() {
 	DEPTH = clip_pos.z;
 	// Refract UV
 	vec2 refracted_uv = SCREEN_UV;
-	refract_uv(refracted_uv, NORMAL_MAP, sqrt(DEPTH) * relative_depth);
+	float is_ortho = PROJECTION_MATRIX[3][3];
+	float depth_mult = is_ortho != 0.0 ? 1.0 : max(0.0001, sqrt(DEPTH));
+	refract_uv(refracted_uv, NORMAL_MAP, depth_mult * relative_depth);
 
 	vec3 screen;
 	float depth_blend;

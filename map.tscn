@@ -9,7 +9,6 @@
 [ext_resource type="Resource" uid="uid://dkkpml6w0got6" path="res://biomes/biome_desert.tres" id="5_iw27f"]
 [ext_resource type="PackedScene" uid="uid://dc6dgdjoiagk6" path="res://UI/TurretHotbar.tscn" id="6_hotbar"]
 [ext_resource type="Shader" uid="uid://8haud4yhw01k" path="res://addons/Shader/sandstrom.gdshader" id="7_6qsgm"]
-[ext_resource type="Shader" uid="uid://cq2tbmm5ge7br" path="res://addons/Shader/heat-haze.gdshader" id="7_71pa8"]
 [ext_resource type="Script" uid="uid://wguegcpphxbe" path="res://scripts/BuilderController.gd" id="7_builder"]
 [ext_resource type="Material" uid="uid://cr8yf6r3utjih" path="res://addons/Textures/water_mat.tres" id="10_oysan"]
 
@@ -33,25 +32,6 @@ shader_parameter/density = 0.9999999747
 shader_parameter/grad_tex = SubResource("GradientTexture1D_qwqyf")
 shader_parameter/emision = Color(0, 0, 0, 1)
 shader_parameter/fog_speed = 1.510000309225
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_qwqyf"]
-resource_local_to_scene = true
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_62yky"]
-resource_local_to_scene = true
-noise = SubResource("FastNoiseLite_qwqyf")
-seamless = true
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_mti6b"]
-resource_local_to_scene = true
-render_priority = 0
-shader = ExtResource("7_71pa8")
-shader_parameter/noise_texture = SubResource("NoiseTexture2D_62yky")
-shader_parameter/speed = 0.04000000050297
-shader_parameter/strength = 0.005
-
-[sub_resource type="QuadMesh" id="QuadMesh_4kxuq"]
-size = Vector2(800, 400)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_m8r5s"]
 lightmap_size_hint = Vector2i(12, 12)
@@ -91,14 +71,8 @@ far = 150.0
 script = ExtResource("2_p5pve")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=240699733]
-transform = Transform3D(0.8660253, -0.35355332, 0.35355377, 0, 0.7071072, 0.7071064, -0.50000024, -0.612372, 0.61237276, 23.904772, 26.098438, 32.629635)
+transform = Transform3D(0.8660254, -0.28678823, 0.40957603, 0, 0.81915206, 0.57357645, -0.5, -0.49673176, 0.7094065, 23.904772, 26.098438, 32.629635)
 shadow_enabled = true
-
-[node name="Heatwave" type="MeshInstance3D" parent="." unique_id=81203874]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.036003113, 9.536743e-07, 0.033112526)
-visible = false
-material_override = SubResource("ShaderMaterial_mti6b")
-mesh = SubResource("QuadMesh_4kxuq")
 
 [node name="SubViewport" type="SubViewport" parent="." unique_id=1033910215]
 use_hdr_2d = true
