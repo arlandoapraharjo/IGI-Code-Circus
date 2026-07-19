@@ -44,6 +44,7 @@ func _create_enemy_node() -> Node3D:
 	# Pick a random UFO model for this pool slot
 	var model_scene = enemy_models[randi() % enemy_models.size()]
 	var model_instance = model_scene.instantiate()
+	_set_extra_cull_margin_recursive(model_instance, 100.0)
 	enemy_root.add_child(model_instance)
 
 	# Parent to the Map node
@@ -80,3 +81,9 @@ func _on_enemy_reached_end(enemy: Node3D) -> void:
 	# Return the enemy to the pool for reuse
 	_active_enemies.erase(enemy)
 	_pool.append(enemy)
+
+func _set_extra_cull_margin_recursive(node: Node, margin: float) -> void:
+	if node is GeometryInstance3D:
+		node.extra_cull_margin = margin
+	for child in node.get_children():
+		_set_extra_cull_margin_recursive(child, margin)

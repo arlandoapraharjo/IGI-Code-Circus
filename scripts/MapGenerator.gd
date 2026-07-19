@@ -504,6 +504,7 @@ func _make_multimesh_node(node_name: String, scene: PackedScene) -> MultiMeshIns
 	var mmi = MultiMeshInstance3D.new()
 	mmi.name = node_name
 	mmi.physics_interpolation_mode = 2 # Node.PHYSICS_INTERPOLATION_MODE_OFF
+	mmi.extra_cull_margin = 100.0
 	add_child(mmi)
 
 	var extracted = _extract_mesh_and_material(scene)
@@ -527,6 +528,7 @@ func _make_border_wall_node(node_name: String, remove_texture: bool = false) -> 
 	mmi.name = node_name
 	mmi.physics_interpolation_mode = 2 # Node.PHYSICS_INTERPOLATION_MODE_OFF
 	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if BORDER_WALL_CAST_SHADOWS else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mmi.extra_cull_margin = 100.0
 	add_child(mmi)
 
 	var uv_rect := _get_tile_uv_rect(tile_base)
@@ -685,6 +687,7 @@ func _make_bush_variant_nodes(scene: PackedScene, count: int) -> Array[MultiMesh
 		var mmi = MultiMeshInstance3D.new()
 		mmi.name = "Bushes_Variant%d" % i
 		mmi.physics_interpolation_mode = 2 # Node.PHYSICS_INTERPOLATION_MODE_OFF
+		mmi.extra_cull_margin = 100.0
 		add_child(mmi)
 
 		var mm = MultiMesh.new()
