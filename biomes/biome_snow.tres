@@ -11,7 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://38nk5i8vrf66" path="res://assets/Models/GLB format/snow/snow-tile-straight.glb" id="7_wh0ca"]
 [ext_resource type="PackedScene" uid="uid://c58bkhmbqu1uq" path="res://assets/Models/GLB format/snow/snow-tile-tree-quad.glb" id="10_hl46c"]
 [ext_resource type="PackedScene" uid="uid://b45namaxsgl8f" path="res://assets/Models/GLB format/snow/snow-detail-tree.glb" id="11_wh0ca"]
-[ext_resource type="Resource" path="res://UI/hotbar_theme_snow.tres" id="12_snow"]
+[ext_resource type="Resource" path="res://UI/Hotbar/hotbar_theme_snow.tres" id="12_snow"]
 
 [resource]
 script = ExtResource("1_87pvo")

@@ -10,7 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://6ljpwl3pkb5l" path="res://assets/Models/GLB format/desert/desert-tile-spawn.tscn" id="8_vpp5a"]
 [ext_resource type="PackedScene" uid="uid://8yl2cyvdmycj" path="res://assets/Models/GLB format/desert/desert-tile-straight.tscn" id="9_tttv0"]
 [ext_resource type="PackedScene" uid="uid://d2pxuqb8xalnw" path="res://assets/Models/GLB format/desert/Cactuss.glb" id="10_oq5im"]
-[ext_resource type="Resource" uid="uid://b1rex4wqywsql" path="res://UI/hotbar_theme_desert.tres" id="11_theme"]
+[ext_resource type="Resource" uid="uid://b1rex4wqywsql" path="res://UI/Hotbar/hotbar_theme_desert.tres" id="11_theme"]
 
 [resource]
 script = ExtResource("1_725qa")

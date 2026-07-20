@@ -11,7 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://cj4qd2hccxfxk" path="res://assets/Models/GLB format/grass/tile-straight.glb" id="9_1g7nn"]
 [ext_resource type="PackedScene" uid="uid://dcv0uenc3f0r" path="res://assets/Models/GLB format/grass/tile-tree-quad.glb" id="10_xil8r"]
 [ext_resource type="PackedScene" uid="uid://couxy71kfds8n" path="res://assets/Models/GLB format/grass/tile-tree.glb" id="11_xjj5y"]
-[ext_resource type="Resource" path="res://UI/hotbar_theme_grass.tres" id="12_grass"]
+[ext_resource type="Resource" path="res://UI/Hotbar/hotbar_theme_grass.tres" id="12_grass"]
 
 [resource]
 script = ExtResource("1_36vdi")

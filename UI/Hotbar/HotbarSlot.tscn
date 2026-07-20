@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://14xtdro5tc7m"]
 
-[ext_resource type="Script" uid="uid://b64sdroxxtpdf" path="res://UI/HotbarSlot.gd" id="1_slot"]
+[ext_resource type="Script" uid="uid://b64sdroxxtpdf" path="res://UI/Hotbar/HotbarSlot.gd" id="1_slot"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nmgbl"]
 
