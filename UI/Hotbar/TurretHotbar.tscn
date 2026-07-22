@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dc6dgdjoiagk6"]
 
-[ext_resource type="Script" uid="uid://carrttrorwd0v" path="res://UI/TurretHotbar.gd" id="1_hotbar"]
+[ext_resource type="Script" uid="uid://carrttrorwd0v" path="res://UI/Hotbar/TurretHotbar.gd" id="1_hotbar"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_title"]
 font_size = 10

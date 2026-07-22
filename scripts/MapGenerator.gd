@@ -94,6 +94,19 @@ func _ready():
 	_generate_path()
 	_build_map()
 	_setup_spawner()
+	
+	# Fade in transition
+	var canvas = CanvasLayer.new()
+	canvas.layer = 100
+	add_child(canvas)
+	var fade_rect = ColorRect.new()
+	fade_rect.color = Color(0, 0, 0, 1)
+	fade_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	canvas.add_child(fade_rect)
+	
+	var tween = create_tween()
+	tween.tween_property(fade_rect, "color", Color(0, 0, 0, 0), 0.5)
+	tween.tween_callback(func(): canvas.queue_free())
 
 func is_buildable(grid_pos: Vector2i) -> bool:
 	if grid_pos.x < 0 or grid_pos.x >= MAP_SIZE or grid_pos.y < 0 or grid_pos.y >= MAP_SIZE:

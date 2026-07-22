@@ -77,7 +77,7 @@ signal turret_selected(index: int, scene: PackedScene, attack_range: float)
 
 # ── Turret Assets ─────────────────────────────────────────────────────────────
 
-const SLOT_SCENE := preload("res://UI/HotbarSlot.tscn")
+const SLOT_SCENE := preload("res://UI/Hotbar/HotbarSlot.tscn")
 
 const TURRET_ASSETS: Array[Dictionary] = [
 	{

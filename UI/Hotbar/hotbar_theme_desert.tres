@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="HotbarTheme" format=3 uid="uid://b1rex4wqywsql"]
 
-[ext_resource type="Script" uid="uid://ch4ytpvsh5nx8" path="res://UI/HotbarTheme.gd" id="1_desert"]
+[ext_resource type="Script" uid="uid://ch4ytpvsh5nx8" path="res://UI/Hotbar/HotbarTheme.gd" id="1_desert"]
 
 [resource]
 script = ExtResource("1_desert")
