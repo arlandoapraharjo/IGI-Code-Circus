@@ -114,9 +114,9 @@ var _selected_index: int = -1
 var _is_open: bool = false
 var _toggle_btn: Button = null
 var _panel_tween: Tween = null
-var _panel_target_y: float = 0.0
+var _panel_target_pos: Vector2 = Vector2.ZERO
 
-@onready var slot_container: HBoxContainer = $HotbarPanel/VBox/MarginContainer/SlotContainer
+@onready var slot_container: BoxContainer = $HotbarPanel/VBox/MarginContainer/SlotContainer
 @onready var hotbar_panel: PanelContainer  = $HotbarPanel
 @onready var border_overlay: TextureRect   = $HotbarPanel/VBox/MarginContainer/BorderOverlay
 @onready var bg_overlay: TextureRect       = $HotbarPanel/VBox/MarginContainer/BgOverlay
@@ -143,24 +143,38 @@ func _connect_to_map_generator() -> void:
 # ── Popup Toggle ───────────────────────────────────────────────────────────────
 
 func _setup_popup() -> void:
-	# Wait one frame so the panel has its final size
 	await get_tree().process_frame
 
-	# Store the panel's "open" Y position and hide it off-screen
-	_panel_target_y = hotbar_panel.position.y
-	hotbar_panel.position.y = hotbar_panel.position.y + hotbar_panel.size.y + 20
-	hotbar_panel.visible = true
-
-	# Create the toggle button at the bottom center
 	_toggle_btn = Button.new()
-	_toggle_btn.text = "▲ Turrets"
-	_toggle_btn.custom_minimum_size = Vector2(120, 32)
 	_toggle_btn.pressed.connect(_toggle_hotbar)
-	# Style the button to match the hotbar theme
-	_apply_toggle_style()
-	# Add as a sibling control so it lives in the same CanvasLayer
 	add_child(_toggle_btn)
-	# Position it at bottom center
+	
+	_update_layout()
+	hotbar_panel.visible = true
+	_is_open = true
+	_hide_hotbar()
+
+func _update_layout() -> void:
+	if not is_instance_valid(_toggle_btn) or not is_instance_valid(hotbar_panel): return
+
+	var is_desert = (current_biome_folder == "Desert")
+
+	# Both desert and non-desert now use the bottom layout.
+	# (The old left-side vertical desert layout is disabled.)
+	slot_container.vertical = false
+	hotbar_panel.anchor_left = 0.5
+	hotbar_panel.anchor_top = 1.0
+	hotbar_panel.anchor_right = 0.5
+	hotbar_panel.anchor_bottom = 1.0
+	hotbar_panel.offset_top = -4.0
+	hotbar_panel.offset_bottom = -4.0
+	hotbar_panel.offset_left = -hotbar_panel.size.x / 2.0
+	hotbar_panel.offset_right = hotbar_panel.size.x / 2.0
+	hotbar_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	hotbar_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+
+	_toggle_btn.text = "▲ Turrets" if not _is_open else "▼ Close"
+	_toggle_btn.custom_minimum_size = Vector2(120, 32)
 	_toggle_btn.anchor_left = 0.5
 	_toggle_btn.anchor_right = 0.5
 	_toggle_btn.anchor_top = 1.0
@@ -170,16 +184,46 @@ func _setup_popup() -> void:
 	_toggle_btn.offset_top = -32
 	_toggle_btn.offset_bottom = 0
 	_toggle_btn.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_toggle_btn.grow_vertical = Control.GROW_DIRECTION_BEGIN
+
+	# No gap between desert cards — flush/touching.
+	if is_desert:
+		slot_spacing = 0
+	else:
+		slot_spacing = 10
+	_apply_slot_spacing()
+
+	_apply_toggle_style()
+
+	# Position the panel in closed/open state
+	var default_y = get_viewport().get_visible_rect().size.y - 4.0 - hotbar_panel.size.y
+	_panel_target_pos.y = default_y
+	if not _is_open:
+		hotbar_panel.position.y = _panel_target_pos.y + hotbar_panel.size.y + 20
+		_toggle_btn.offset_top = -32
+		_toggle_btn.offset_bottom = 0
+	else:
+		hotbar_panel.position.y = _panel_target_pos.y
+		_toggle_btn.offset_top = -32 - hotbar_panel.size.y - 4
+		_toggle_btn.offset_bottom = 0 - hotbar_panel.size.y - 4
 
 func _apply_toggle_style() -> void:
+	if not is_instance_valid(_toggle_btn): return
 	var style_normal := StyleBoxFlat.new()
 	style_normal.bg_color = panel_bg_color
 	style_normal.border_color = panel_border_color
 	style_normal.set_border_width_all(2)
-	style_normal.corner_radius_top_left = 8
-	style_normal.corner_radius_top_right = 8
-	style_normal.corner_radius_bottom_left = 0
-	style_normal.corner_radius_bottom_right = 0
+	if current_biome_folder == "Desert":
+		style_normal.corner_radius_top_left = 0
+		style_normal.corner_radius_top_right = 8
+		style_normal.corner_radius_bottom_left = 0
+		style_normal.corner_radius_bottom_right = 8
+	else:
+		style_normal.corner_radius_top_left = 8
+		style_normal.corner_radius_top_right = 8
+		style_normal.corner_radius_bottom_left = 0
+		style_normal.corner_radius_bottom_right = 0
+		
 	_toggle_btn.add_theme_stylebox_override("normal", style_normal)
 
 	var style_hover := style_normal.duplicate()
@@ -211,8 +255,10 @@ func _show_hotbar() -> void:
 	_panel_tween = create_tween()
 	_panel_tween.set_ease(Tween.EASE_OUT)
 	_panel_tween.set_trans(Tween.TRANS_BACK)
-	# Slide panel up, push toggle button up above it
-	_panel_tween.tween_property(hotbar_panel, "position:y", _panel_target_y, 0.35)
+
+	# Always bottom-slide (desert and non-desert both use bottom hotbar)
+	_panel_target_pos.y = get_viewport().get_visible_rect().size.y - 4.0 - hotbar_panel.size.y
+	_panel_tween.tween_property(hotbar_panel, "position:y", _panel_target_pos.y, 0.35)
 	_panel_tween.parallel().tween_property(_toggle_btn, "offset_top", -32 - hotbar_panel.size.y - 4, 0.35)
 	_panel_tween.parallel().tween_property(_toggle_btn, "offset_bottom", 0 - hotbar_panel.size.y - 4, 0.35)
 
@@ -227,8 +273,10 @@ func _hide_hotbar() -> void:
 	_panel_tween = create_tween()
 	_panel_tween.set_ease(Tween.EASE_IN)
 	_panel_tween.set_trans(Tween.TRANS_CUBIC)
-	# Slide panel back down off screen, toggle button returns to bottom
-	var hidden_y = _panel_target_y + hotbar_panel.size.y + 20
+
+	# Always bottom-slide
+	_panel_target_pos.y = get_viewport().get_visible_rect().size.y - 4.0 - hotbar_panel.size.y
+	var hidden_y = _panel_target_pos.y + hotbar_panel.size.y + 20
 	_panel_tween.tween_property(hotbar_panel, "position:y", hidden_y, 0.25)
 	_panel_tween.parallel().tween_property(_toggle_btn, "offset_top", -32, 0.25)
 	_panel_tween.parallel().tween_property(_toggle_btn, "offset_bottom", 0, 0.25)
@@ -267,38 +315,57 @@ var _biome_frames: Array[Texture2D] = []
 
 func _load_biome_frames() -> void:
 	_biome_frames.clear()
-	for i in range(2, 9):
-		var tex_path = "res://UI/%s/Sprite-000%d.png" % [current_biome_folder, i]
-		if ResourceLoader.exists(tex_path):
-			_biome_frames.append(load(tex_path))
-			
+	if current_biome_folder == "Desert":
+		# For desert: use Desert 6 as the card tile for each slot.
+		# No animated frames needed — the card is the static background.
+		var card_path = "res://UI/Desert/Desert 6.png"
+		if ResourceLoader.exists(card_path):
+			_biome_frames.append(load(card_path))
+	else:
+		for i in range(2, 9):
+			var tex_path = "res://UI/%s/Sprite-000%d.png" % [current_biome_folder, i]
+			if ResourceLoader.exists(tex_path):
+				_biome_frames.append(load(tex_path))
+
 	if is_node_ready() and border_overlay:
-		var border_path = "res://UI/%s/%s Border Trial 1.png" % [current_biome_folder, current_biome_folder]
-		if ResourceLoader.exists(border_path):
-			border_overlay.texture = load(border_path)
+		if current_biome_folder == "Desert":
+			# Desert uses individual card tiles — no panel border overlay needed.
+			border_overlay.texture = null
+			# Fully transparent panel so only the card tiles show.
 			hotbar_panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
-			# Optional: hide the title label if there's a custom pixel-art border
 			$HotbarPanel/VBox/TitleLabel.hide()
 		else:
-			border_overlay.texture = null
-			_apply_panel_style()
-			$HotbarPanel/VBox/TitleLabel.show()
-			
+			var border_path = "res://UI/%s/%s Border Trial 1.png" % [current_biome_folder, current_biome_folder]
+			if ResourceLoader.exists(border_path):
+				border_overlay.texture = load(border_path)
+				hotbar_panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+				$HotbarPanel/VBox/TitleLabel.hide()
+			else:
+				border_overlay.texture = null
+				_apply_panel_style()
+				$HotbarPanel/VBox/TitleLabel.show()
+
 	if is_node_ready() and bg_overlay:
-		var bg_path = "res://UI/%s/%s Border BG Trial 1.png" % [current_biome_folder, current_biome_folder]
-		if ResourceLoader.exists(bg_path):
-			bg_overlay.texture = load(bg_path)
-		else:
+		if current_biome_folder == "Desert":
 			bg_overlay.texture = null
+		else:
+			var bg_path = "res://UI/%s/%s Border BG Trial 1.png" % [current_biome_folder, current_biome_folder]
+			if ResourceLoader.exists(bg_path):
+				bg_overlay.texture = load(bg_path)
+			else:
+				bg_overlay.texture = null
 
 func _populate_slots() -> void:
 	if _biome_frames.is_empty():
 		_load_biome_frames()
+	var is_desert = (current_biome_folder == "Desert")
 	for i in range(min(TURRET_ASSETS.size(), _slots.size())):
 		var entry: Dictionary = TURRET_ASSETS[i]
 		set_slot_turret(i, entry["scene"], entry["name"])
 		if _slots[i].has_method("set_bg_frames"):
 			_slots[i].set_bg_frames(_biome_frames)
+		if _slots[i].has_method("set_desert_mode"):
+			_slots[i].set_desert_mode(is_desert)
 
 # ── Style application ──────────────────────────────────────────────────────────
 
@@ -395,13 +462,13 @@ func _on_biome_changed(biome: BiomeData) -> void:
 		elif path.find("snow") != -1 or path.find("ice") != -1: current_biome_folder = "Ice"
 	_load_biome_frames()
 	_populate_slots()
-	if _toggle_btn:
-		_apply_toggle_style()
+	_update_layout()
 
 func _on_slot_clicked(index: int) -> void:
 	if _selected_index == index:
 		_slots[index].set_selected(false)
 		_selected_index = -1
+		_update_slot_opacities()
 		var builder = get_tree().get_root().find_child("BuilderController", true, false)
 		if builder and builder.has_method("stop_building"):
 			builder.stop_building()
@@ -410,10 +477,23 @@ func _on_slot_clicked(index: int) -> void:
 		_slots[_selected_index].set_selected(false)
 	_selected_index = index
 	_slots[index].set_selected(true)
+	_update_slot_opacities()
 	turret_selected.emit(index, TURRET_ASSETS[index]["scene"], TURRET_ASSETS[index].get("attack_range", 1.5))
 
 func _on_building_stopped() -> void:
 	if _selected_index != -1 and _selected_index < _slots.size():
 		_slots[_selected_index].set_selected(false)
 		_selected_index = -1
+		_update_slot_opacities()
 	_hide_hotbar()
+
+func _update_slot_opacities() -> void:
+	var has_selection = _selected_index != -1
+	for i in range(_slots.size()):
+		if has_selection:
+			if i == _selected_index:
+				_slots[i].modulate.a = 1.0
+			else:
+				_slots[i].modulate.a = 0.5
+		else:
+			_slots[i].modulate.a = 1.0

@@ -44,7 +44,7 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 0
 
-[node name="SlotContainer" type="HBoxContainer" parent="HotbarPanel/VBox/MarginContainer" unique_id=2014144049]
+[node name="SlotContainer" type="BoxContainer" parent="HotbarPanel/VBox/MarginContainer" unique_id=2014144049]
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
